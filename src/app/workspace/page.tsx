@@ -1,7 +1,7 @@
 'use client';
 
 import AnimatedSection from '@/components/animation/AnimatedSection';
-import WorkspaceCard from '@/components/ui/WorkspaceCard';
+import WorkspaceCard from '@/components/ui/SlideAndVideoCard';
 import Sidebar from '@/components/Sidebar';
 import { workspaceConfig } from '@/config/workspaceConfig';
 import { Plus } from 'lucide-react';

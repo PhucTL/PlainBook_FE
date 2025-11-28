@@ -25,7 +25,7 @@ export default function Header() {
               Giới thiệu
             </Link>
             <Link href="/workspace" className="text-gray-700 hover:text-blue-600 transition-colors">
-              Bảng giá
+              Không gian làm việc
             </Link>
           </nav>
 
