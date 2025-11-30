@@ -1,10 +1,18 @@
 'use client';
 import { useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { Clock, Eye, EyeOff } from 'lucide-react';
+import { useUserServices, useLoginGoogleService } from '@/services/userService';
 
 export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  
+  const router = useRouter();
+  const loginMutation = useUserServices();
+  const googleLoginMutation = useLoginGoogleService();
 
   return (
     <div className="min-h-screen flex">
@@ -29,7 +37,7 @@ export default function LoginPage() {
           </div>
 
           {/* Form */}
-          <form className="mt-8 space-y-6">
+          <form onSubmit={handleSubmit} className="mt-8 space-y-6">
             <div className="space-y-4">
               {/* Email Input */}
               <div>
@@ -37,10 +45,12 @@ export default function LoginPage() {
                   Email / Tên đăng nhập
                 </label>
                 <input
-                  id="email"
-                  name="email"
+                  id="username"
+                  name="username"
                   type="text"
                   required
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
                   className="appearance-none relative block w-full px-4 py-3 border border-gray-300 placeholder-gray-400 text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   placeholder="Nhập email của bạn"
                 />
@@ -57,6 +67,8 @@ export default function LoginPage() {
                     name="password"
                     type={showPassword ? 'text' : 'password'}
                     required
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
                     className="appearance-none relative block w-full px-4 py-3 border border-gray-300 placeholder-gray-400 text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent pr-12"
                     placeholder="Nhập mật khẩu của bạn"
                   />
@@ -80,12 +92,33 @@ export default function LoginPage() {
               </div>
             </div>
 
+            {/* Error Message */}
+            {loginMutation.isError && (
+              <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md">
+                <p className="text-sm">
+                  <strong>⚠️ Lỗi đăng nhập:</strong>{' '}
+                  {getErrorMessage(loginMutation.error)}
+                </p>
+              </div>
+            )}
+
             {/* Submit Button */}
             <button
               type="submit"
-              className="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-base font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
+              disabled={loginMutation.isPending}
+              className="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-base font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              Đăng nhập
+              {loginMutation.isPending ? (
+                <span className="flex items-center">
+                  <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  Đang đăng nhập...
+                </span>
+              ) : (
+                'Đăng nhập'
+              )}
             </button>
 
             {/* Divider */}
@@ -102,7 +135,9 @@ export default function LoginPage() {
             <div className="grid grid-cols-2 gap-4">
               <button
                 type="button"
-                className="flex items-center justify-center px-4 py-3 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
+                onClick={handleGoogleLogin}
+                disabled={googleLoginMutation.isPending}
+                className="flex items-center justify-center px-4 py-3 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors disabled:opacity-50"
               >
                 <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24">
                   <path
@@ -211,4 +246,74 @@ export default function LoginPage() {
       </div>
     </div>
   );
+
+  // Handle normal login
+  function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    
+    loginMutation.mutate(
+      { username, password },
+      {
+        onSuccess: (response) => {
+          // Lưu token vào localStorage
+          const token = response?.data?.token || response?.data?.data?.token;
+          const refreshToken = response?.data?.refreshToken || response?.data?.data?.refreshToken;
+          
+          if (token) {
+            localStorage.setItem('token', token);
+          }
+          if (refreshToken) {
+            localStorage.setItem('refreshToken', refreshToken);
+          }
+          
+          // Redirect đến workspace
+          router.push('/workspace');
+        },
+        onError: (error) => {
+          console.error('Login error:', error);
+          // Error message sẽ hiển thị qua UI
+        },
+      }
+    );
+  }
+
+  // Handle Google login
+  function handleGoogleLogin() {
+    // TODO: Implement Google OAuth flow
+    // 1. Redirect to Google OAuth
+    // 2. Get idToken from Google
+    // 3. Call googleLoginMutation.mutate({ idToken })
+    
+    console.log('Google login clicked - implement OAuth flow');
+    alert('Chức năng đăng nhập Google đang được phát triển');
+  }
+
+  // Extract error message from API response
+  function getErrorMessage(error: any): string {
+    // Backend trả message ở response.data (string trực tiếp)
+    const responseData = error?.response?.data;
+    
+    // Nếu response.data là string trực tiếp (như "Sai ID hoặc mật khẩu!")
+    if (typeof responseData === 'string' && responseData.trim() !== '') {
+      return responseData;
+    }
+    
+    // Hoặc nếu nằm trong object
+    const backendMessage = responseData?.data || 
+                          responseData?.message ||
+                          error?.data?.data ||
+                          error?.data?.message;
+    
+    if (typeof backendMessage === 'string' && backendMessage.trim() !== '') {
+      return backendMessage;
+    }
+    
+    // Fallback messages dựa trên status code
+    const status = error?.response?.status;
+    if (status === 400) {
+      return 'Sai tên đăng nhập hoặc mật khẩu!';
+    }
+    
+    return 'Đăng nhập thất bại. Vui lòng kiểm tra lại thông tin.';
+  }
 }

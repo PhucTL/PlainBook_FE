@@ -1,0 +1,70 @@
+import { refreshAuthToken } from "@/utils/authutils"; 
+import axios from "axios";
+import type { AxiosInstance } from "axios";
+
+// Main API instance (default port)
+const api = axios.create({
+  baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://34.124.179.17:8080',
+});
+
+// Secondary API instance (different port)
+export const apiSecondary = axios.create({
+  baseURL: process.env.NEXT_PUBLIC_API_SECONDARY_URL || 'http://34.124.179.17:8000',
+});
+
+// Helper function to setup interceptors for both instances
+const setupInterceptors = (axiosInstance: AxiosInstance) => {
+  // Request interceptor
+  axiosInstance.interceptors.request.use(
+    function (config) {
+      if (typeof window !== 'undefined') {
+        const token = localStorage.getItem("token");
+        if (token) {
+          config.headers.Authorization = `Bearer ${token}`;
+        }
+      }
+      return config;
+    },
+    function (error) {
+      return Promise.reject(error);
+    }
+  );
+
+  // Response interceptor
+  axiosInstance.interceptors.response.use(
+    (response) => response,
+    async (error) => {
+      const originalRequest = error.config;
+
+      if (error.response?.status === 401 && !originalRequest._retry) {
+        originalRequest._retry = true; // Prevent infinite retry loop
+
+        try {
+          const newToken = await refreshAuthToken();
+
+          // Update both instances
+          axios.defaults.headers.common["Authorization"] = `Bearer ${newToken}`;
+          originalRequest.headers.Authorization = `Bearer ${newToken}`;
+
+          return axiosInstance(originalRequest);
+        } catch (refreshError) {
+          console.error("Refresh token failed:", refreshError);
+          // Redirect to login on refresh failure
+          if (typeof window !== "undefined") {
+            localStorage.removeItem("token");
+            window.location.href = "/login";
+          }
+        }
+      }
+
+      return Promise.reject(error);
+    }
+  );
+};
+
+// Setup interceptors for all instances
+setupInterceptors(api);
+setupInterceptors(apiSecondary);
+
+// Export default
+export default api;
