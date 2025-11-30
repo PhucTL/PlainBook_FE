@@ -1,8 +1,12 @@
 'use client';
 
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { Database, BookOpen, GraduationCap, FileText, Presentation, Grid3x3, Video, LogOut } from 'lucide-react';
 import { usePathname } from 'next/navigation';
+import { useLogoutService } from '@/services/userService';
+import { showSuccess, showError } from '@/lib/toast';
+import { logError } from '@/lib/middleware';
 
 interface SidebarItem {
   icon: React.ElementType;
@@ -22,9 +26,62 @@ const sidebarItems: SidebarItem[] = [
 
 export default function Sidebar() {
   const pathname = usePathname();
+  const router = useRouter();
+  const logoutMutation = useLogoutService();
+
+  const handleLogout = () => {
+    const refreshToken = localStorage.getItem('refreshToken');
+    
+    if (!refreshToken) {
+      // Nếu không có refreshToken, vẫn clear localStorage và redirect
+      localStorage.removeItem('token');
+      localStorage.removeItem('refreshToken');
+      
+      // Trigger auth-change event
+      window.dispatchEvent(new Event('auth-change'));
+      
+      showSuccess('Đăng xuất thành công!');
+      setTimeout(() => router.push('/login'), 1000);
+      return;
+    }
+
+    // Call API logout với refreshToken
+    logoutMutation.mutate(
+      { refreshToken },
+      {
+        onSuccess: () => {
+          // Clear localStorage
+          localStorage.removeItem('token');
+          localStorage.removeItem('refreshToken');
+          
+          // Trigger auth-change event
+          window.dispatchEvent(new Event('auth-change'));
+          
+          // Hiển thị thông báo
+          showSuccess('Đăng xuất thành công!');
+          
+          // Redirect về login
+          setTimeout(() => router.push('/login'), 1000);
+        },
+        onError: (error) => {
+          logError(error, 'Logout');
+          
+          // Vẫn clear localStorage và redirect dù API lỗi
+          localStorage.removeItem('token');
+          localStorage.removeItem('refreshToken');
+          
+          // Trigger auth-change event
+          window.dispatchEvent(new Event('auth-change'));
+          
+          showError('Đã xảy ra lỗi khi đăng xuất');
+          setTimeout(() => router.push('/login'), 1000);
+        },
+      }
+    );
+  };
 
   return (
-    <aside className="w-64 bg-white border-r border-gray-200 h-screen flex flex-col sticky top-0">
+    <aside className="w-64 bg-white border-r border-gray-200 h-screen flex flex-col fixed left-0 top-0">
       {/* Logo Section */}
       <div className="p-6 border-b border-gray-200">
         <Link href="/" className="flex items-center gap-2">
@@ -60,7 +117,7 @@ export default function Sidebar() {
 
       {/* User Profile Section */}
       <div className="p-4 border-t border-gray-200">
-        <div className="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer">
+        <div className="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-50 transition-colors">
           <div className="w-10 h-10 rounded-full bg-linear-to-br from-blue-400 to-blue-600 flex items-center justify-center text-white font-semibold">
             A
           </div>
@@ -68,7 +125,12 @@ export default function Sidebar() {
             <p className="text-sm font-medium text-gray-900 truncate">Nguyễn Văn A</p>
             <p className="text-xs text-gray-500 truncate">nv.a@example.com</p>
           </div>
-          <button className="p-1 hover:bg-gray-100 rounded">
+          <button 
+            onClick={handleLogout}
+            disabled={logoutMutation.isPending}
+            className="p-1 hover:bg-gray-100 rounded disabled:opacity-50 disabled:cursor-not-allowed"
+            title="Đăng xuất"
+          >
             <LogOut className="w-4 h-4 text-gray-500" />
           </button>
         </div>

@@ -4,7 +4,6 @@ import { useState } from 'react';
 import AnimatedSection from '@/components/animation/AnimatedSection';
 import SlideAndVideoCard from '@/components/ui/SlideAndVideoCard';
 import Pagination from '@/components/ui/Pagination';
-import Sidebar from '@/components/Sidebar';
 import { slideConfig } from '@/config/slideConfig';
 import { Plus } from 'lucide-react';
 
@@ -12,13 +11,8 @@ export default function SlidePage() {
   const [currentPage, setCurrentPage] = useState(1);
 
   return (
-    <div className="flex min-h-screen bg-gray-50">
-      <Sidebar />
-
-      {/* Main Content */}
-      <div className="flex-1 flex flex-col">
-        <MainContentSection currentPage={currentPage} setCurrentPage={setCurrentPage} />
-      </div>
+    <div className="flex flex-col">
+      <MainContentSection currentPage={currentPage} setCurrentPage={setCurrentPage} />
     </div>
   );
 }

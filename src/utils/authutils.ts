@@ -9,7 +9,7 @@ export const refreshAuthToken = async () => {
     });
 
     const newAccessToken = response.data.data.token;
-    console.log(newAccessToken);
+    // console.log(newAccessToken);
     localStorage.setItem("token", newAccessToken);
     return newAccessToken;
   }

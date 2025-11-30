@@ -4,7 +4,6 @@ import { useState } from 'react';
 import AnimatedSection from '@/components/animation/AnimatedSection';
 import SlideAndVideoCard from '@/components/ui/SlideAndVideoCard';
 import Pagination from '@/components/ui/Pagination';
-import Sidebar from '@/components/Sidebar';
 import { videoConfig } from '@/config/videoConfig';
 import { Plus } from 'lucide-react';
 
@@ -12,20 +11,15 @@ export default function VideoPage() {
   const [currentPage, setCurrentPage] = useState(1);
 
   return (
-    <div className="flex min-h-screen bg-gray-50">
-      <Sidebar />
-
-      {/* Main Content */}
-      <div className="flex-1 flex flex-col">
-        <MainContentSection currentPage={currentPage} setCurrentPage={setCurrentPage} />
-      </div>
+    <div className="flex flex-col">
+      <MainContentSection currentPage={currentPage} setCurrentPage={setCurrentPage} />
     </div>
   );
 }
 
 function MainContentSection({ currentPage, setCurrentPage }: { currentPage: number; setCurrentPage: (page: number) => void }) {
   return (
-    <main className="flex-1 p-8">
+    <main className="flex-1 pt-8">
       <WelcomeSection />
       <VideoSection currentPage={currentPage} setCurrentPage={setCurrentPage} />
     </main>

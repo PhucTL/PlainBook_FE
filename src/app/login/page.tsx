@@ -2,8 +2,11 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { Clock, Eye, EyeOff } from 'lucide-react';
+import { Clock, Eye, EyeOff, Loader2 } from 'lucide-react';
+import { GoogleLogin, CredentialResponse } from '@react-oauth/google';
 import { useUserServices, useLoginGoogleService } from '@/services/userService';
+import { getLoginErrorMessage, logError } from '@/lib/middleware';
+import { showSuccess, showError } from '@/lib/toast';
 
 export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
@@ -85,7 +88,7 @@ export default function LoginPage() {
                   </button>
                 </div>
                 <div className="text-right mt-2">
-                  <Link href="#" className="text-sm text-blue-600 hover:text-blue-700">
+                  <Link href="/forgot-password" className="text-sm text-blue-600 hover:text-blue-700">
                     Quên mật khẩu?
                   </Link>
                 </div>
@@ -97,7 +100,7 @@ export default function LoginPage() {
               <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md">
                 <p className="text-sm">
                   <strong>⚠️ Lỗi đăng nhập:</strong>{' '}
-                  {getErrorMessage(loginMutation.error)}
+                  {getLoginErrorMessage(loginMutation.error)}
                 </p>
               </div>
             )}
@@ -110,10 +113,7 @@ export default function LoginPage() {
             >
               {loginMutation.isPending ? (
                 <span className="flex items-center">
-                  <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                  </svg>
+                  <Loader2 className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" />
                   Đang đăng nhập...
                 </span>
               ) : (
@@ -131,62 +131,17 @@ export default function LoginPage() {
               </div>
             </div>
 
-            {/* Social Login Buttons */}
-            <div className="grid grid-cols-2 gap-4">
-              <button
-                type="button"
-                onClick={handleGoogleLogin}
-                disabled={googleLoginMutation.isPending}
-                className="flex items-center justify-center px-4 py-3 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors disabled:opacity-50"
-              >
-                <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24">
-                  <path
-                    fill="#4285F4"
-                    d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
-                  />
-                  <path
-                    fill="#34A853"
-                    d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
-                  />
-                  <path
-                    fill="#FBBC05"
-                    d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
-                  />
-                  <path
-                    fill="#EA4335"
-                    d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
-                  />
-                </svg>
-                Google
-              </button>
-              <button
-                type="button"
-                className="flex items-center justify-center px-4 py-3 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
-              >
-                <svg className="w-5 h-5 mr-2" viewBox="0 0 23 23">
-                  <path
-                    fill="#f3f3f3"
-                    d="M0 0h23v23H0z"
-                  />
-                  <path
-                    fill="#f35325"
-                    d="M1 1h10v10H1z"
-                  />
-                  <path
-                    fill="#81bc06"
-                    d="M12 1h10v10H12z"
-                  />
-                  <path
-                    fill="#05a6f0"
-                    d="M1 12h10v10H1z"
-                  />
-                  <path
-                    fill="#ffba08"
-                    d="M12 12h10v10H12z"
-                  />
-                </svg>
-                Microsoft
-              </button>
+            {/* Google Login Button */}
+            <div className="flex justify-center">
+              <GoogleLogin
+                onSuccess={handleGoogleSuccess}
+                onError={handleGoogleError}
+                theme="outline"
+                size="large"
+                text="signin_with"
+                locale="vi"
+                width="384"
+              />
             </div>
 
             {/* Sign Up Link */}
@@ -206,33 +161,13 @@ export default function LoginPage() {
       </div>
 
       {/* Right Side - Image/Info */}
-      <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-slate-900 to-slate-800 items-center justify-center p-12">
+      <div className="hidden lg:flex lg:w-1/2 bg-linear-to-br from-slate-900 to-slate-800 items-center justify-center p-12">
         <div className="max-w-md text-center">
           <div className="mb-8">
             <div className="w-full h-64 flex items-center justify-center">
               <div className="relative">
                 <div className="absolute inset-0 bg-cyan-500 opacity-20 blur-3xl rounded-full"></div>
-                <div className="relative text-cyan-400 text-6xl">
-                  <svg className="w-48 h-48" viewBox="0 0 200 200" fill="none">
-                    <path
-                      d="M100 20 L180 100 L100 180 L20 100 Z"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      className="opacity-30"
-                    />
-                    <path
-                      d="M100 40 L160 100 L100 160 L40 100 Z"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      className="opacity-50"
-                    />
-                    <path
-                      d="M100 60 L140 100 L100 140 L60 100 Z"
-                      stroke="currentColor"
-                      strokeWidth="3"
-                    />
-                  </svg>
-                </div>
+                <Clock className="relative w-48 h-48 text-cyan-400" />
               </div>
             </div>
           </div>
@@ -266,54 +201,62 @@ export default function LoginPage() {
             localStorage.setItem('refreshToken', refreshToken);
           }
           
-          // Redirect đến workspace
-          router.push('/workspace');
+          // Hiển thị thông báo thành công
+          showSuccess('Đăng nhập thành công! Đang chuyển hướng...');
+          
+          // Redirect đến workspace sau 1.5 giây
+          setTimeout(() => router.push('/workspace'), 1500);
         },
         onError: (error) => {
-          console.error('Login error:', error);
-          // Error message sẽ hiển thị qua UI
+          logError(error, 'Login');
         },
       }
     );
   }
 
-  // Handle Google login
-  function handleGoogleLogin() {
-    // TODO: Implement Google OAuth flow
-    // 1. Redirect to Google OAuth
-    // 2. Get idToken from Google
-    // 3. Call googleLoginMutation.mutate({ idToken })
+  // Handle Google login success
+  function handleGoogleSuccess(credentialResponse: CredentialResponse) {
+    const idToken = credentialResponse.credential;
     
-    console.log('Google login clicked - implement OAuth flow');
-    alert('Chức năng đăng nhập Google đang được phát triển');
+    if (!idToken) {
+      showError('Không nhận được token từ Google');
+      return;
+    }
+
+    // Call backend API with token (not idToken)
+    googleLoginMutation.mutate(
+      { token: idToken },
+      {
+        onSuccess: (response) => {
+          // Lưu token vào localStorage
+          const token = response?.data?.token || response?.data?.data?.token;
+          const refreshToken = response?.data?.refreshToken || response?.data?.data?.refreshToken;
+          console.log('Google login response:', token);
+          
+          if (token) {
+            localStorage.setItem('token', token);
+          }
+          if (refreshToken) {
+            localStorage.setItem('refreshToken', refreshToken);
+          }
+          
+          // Hiển thị thông báo thành công
+          showSuccess('Đăng nhập Google thành công! Đang chuyển hướng...');
+          
+          // Redirect đến workspace sau 1.5 giây
+          setTimeout(() => router.push('/workspace'), 1500);
+        },
+        onError: (error) => {
+          logError(error, 'Google Login');
+          showError('Đăng nhập Google thất bại. Vui lòng thử lại.');
+        },
+      }
+    );
   }
 
-  // Extract error message from API response
-  function getErrorMessage(error: any): string {
-    // Backend trả message ở response.data (string trực tiếp)
-    const responseData = error?.response?.data;
-    
-    // Nếu response.data là string trực tiếp (như "Sai ID hoặc mật khẩu!")
-    if (typeof responseData === 'string' && responseData.trim() !== '') {
-      return responseData;
-    }
-    
-    // Hoặc nếu nằm trong object
-    const backendMessage = responseData?.data || 
-                          responseData?.message ||
-                          error?.data?.data ||
-                          error?.data?.message;
-    
-    if (typeof backendMessage === 'string' && backendMessage.trim() !== '') {
-      return backendMessage;
-    }
-    
-    // Fallback messages dựa trên status code
-    const status = error?.response?.status;
-    if (status === 400) {
-      return 'Sai tên đăng nhập hoặc mật khẩu!';
-    }
-    
-    return 'Đăng nhập thất bại. Vui lòng kiểm tra lại thông tin.';
+  // Handle Google login error
+  function handleGoogleError() {
+    showError('Đăng nhập Google thất bại');
+    logError(new Error('Google login failed'), 'Google Login');
   }
 }

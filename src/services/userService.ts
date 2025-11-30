@@ -45,6 +45,16 @@ export const useLoginGoogleService = () =>
   createMainMutationHook("user-login-google", API_ENDPOINTS.AUTH.LOGIN_GOOGLE)();
 
 /**
+ * Hook đăng xuất
+ * @returns UseMutationResult
+ * @example
+ * const logoutMutation = useLogoutService();
+ * logoutMutation.mutate({ refreshToken: "your-refresh-token" });
+ */
+export const useLogoutService = () =>
+  createMainMutationHook("user-logout", API_ENDPOINTS.AUTH.LOGOUT)();
+
+/**
  * Hook verify user với token
  * @param token - Token verify từ email
  * @returns UseQueryResult

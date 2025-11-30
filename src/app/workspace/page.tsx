@@ -2,17 +2,12 @@
 
 import AnimatedSection from '@/components/animation/AnimatedSection';
 import WorkspaceCard from '@/components/ui/SlideAndVideoCard';
-import Sidebar from '@/components/Sidebar';
 import { workspaceConfig } from '@/config/workspaceConfig';
 import { Plus } from 'lucide-react';
 
 export default function WorkspacePage() {
   return (
-    <div className="flex min-h-screen bg-gray-50">
-      <Sidebar />
-
-      {/* Main Content */}
-      <main className="flex-1 p-8">
+    <div className="p-8">
         {/* Welcome Section */}
         <AnimatedSection animation="fade-up" className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">Chào mừng trở lại!</h1>
@@ -32,7 +27,6 @@ export default function WorkspacePage() {
             <RecentActivitiesSection />
           </div>
         </div>
-      </main>
     </div>
   );
 }

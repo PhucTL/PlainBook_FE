@@ -2,7 +2,6 @@
 
 import { useState } from 'react';
 import AnimatedSection from '@/components/animation/AnimatedSection';
-import Sidebar from '@/components/Sidebar';
 import { lessonPlansConfig } from '@/config/lessonPlansConfig';
 import { Search, Plus, Upload, Edit, Copy, Trash2 } from 'lucide-react';
 import Pagination from '@/components/ui/Pagination';
@@ -12,18 +11,13 @@ export default function LessonPlansPage() {
   const [currentPage, setCurrentPage] = useState(1);
 
   return (
-    <div className="flex min-h-screen bg-gray-50">
-      <Sidebar />
-
-      {/* Main Content */}
-      <div className="flex-1 flex flex-col">
-        <MainContentSection 
-          searchQuery={searchQuery}
-          setSearchQuery={setSearchQuery}
-          currentPage={currentPage}
-          setCurrentPage={setCurrentPage}
-        />
-      </div>
+    <div className="flex flex-col">
+      <MainContentSection 
+        searchQuery={searchQuery}
+        setSearchQuery={setSearchQuery}
+        currentPage={currentPage}
+        setCurrentPage={setCurrentPage}
+      />
     </div>
   );
 }
