@@ -2,7 +2,7 @@ import {
   createMutationHook,
   createQueryHook,
   createQueryWithPathParamHook,
-  patchMutationHook,
+  updateMutationHook,
 } from "@/hooks/react-query";
 import { useQuery, UseQueryResult } from "@tanstack/react-query";
 import { AxiosError } from "axios";
@@ -19,7 +19,7 @@ export const useBookByIdService = createQueryWithPathParamHook(
   API_ENDPOINTS.MASTER_DATA.BOOKS
 );
 export const useCreateBookService = createMutationHook("books", API_ENDPOINTS.MASTER_DATA.BOOKS);
-export const useUpdateBookStatus = patchMutationHook("books", API_ENDPOINTS.MASTER_DATA.BOOKS);
+export const useUpdateBookService = updateMutationHook("books", API_ENDPOINTS.MASTER_DATA.BOOKS);
 
 /**
  * Hook để lấy sách theo subject ID với filter status

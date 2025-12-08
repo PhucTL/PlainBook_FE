@@ -6,6 +6,7 @@ import QueryProvider from "@/components/providers/QueryProvider";
 import LayoutProvider from "@/components/providers/LayoutProvider";
 import { ToastContainer } from 'react-toastify';
 import { GoogleOAuthProvider } from "@react-oauth/google";
+import { Toaster } from 'react-hot-toast';
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -38,6 +39,32 @@ export default function RootLayout({
             {children}
           </LayoutProvider>
           <ToastContainer />
+          <Toaster
+            position="top-right"
+            reverseOrder={false}
+            toastOptions={{
+              duration: 3000,
+              style: {
+                background: '#fff',
+                color: '#363636',
+                padding: '16px',
+                borderRadius: '8px',
+                boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
+              },
+              success: {
+                iconTheme: {
+                  primary: '#10b981',
+                  secondary: '#fff',
+                },
+              },
+              error: {
+                iconTheme: {
+                  primary: '#ef4444',
+                  secondary: '#fff',
+                },
+              },
+            }}
+          />
         </QueryProvider>
         </GoogleOAuthProvider>
       </body>

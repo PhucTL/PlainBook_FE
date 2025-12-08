@@ -21,7 +21,7 @@ const sidebarItems: SidebarItem[] = [
   { icon: FileText, label: 'Đề thi', path: '/exam' },
   { icon: Presentation, label: 'Slide Bài giảng', path: '/slide' },
   { icon: Grid3x3, label: 'Không gian làm việc', path: '/workspace' },
-  { icon: Video, label: 'Video Bài giảng', path: '/video' },
+  { icon: BookOpen, label: 'Sách', path: '/book' },
 ];
 
 export default function Sidebar() {
