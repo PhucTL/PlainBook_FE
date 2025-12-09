@@ -4,12 +4,12 @@ import type { AxiosInstance } from "axios";
 
 // Main API instance (default port)
 const api = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://34.124.179.17:8080',
+  baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://34.126.191.131:8080',
 });
 
 // Secondary API instance (different port)
 export const apiSecondary = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_SECONDARY_URL || 'http://34.124.179.17:8000',
+  baseURL: process.env.NEXT_PUBLIC_API_SECONDARY_URL || 'http://34.126.191.131:8000',
 });
 
 // Helper function to setup interceptors for both instances

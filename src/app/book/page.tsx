@@ -3,9 +3,10 @@
 import { useState } from 'react';
 import AnimatedSection from '@/components/animation/AnimatedSection';
 import Pagination from '@/components/ui/Pagination';
-import { Search, Plus, Edit } from 'lucide-react';
+import { Search, Plus, Edit, BookMarked } from 'lucide-react';
 import { useBooksService } from '@/services/bookServices';
 import BookFormModal from '@/components/ui/BookFormModal';
+import { useRouter } from "next/navigation";
 
 interface Book {
   id: number;
@@ -160,6 +161,7 @@ function BooksTableSection({
   setEditingBook: (book: Book) => void;
 }) {
   const { data: booksData, isLoading, error } = useBooksService();
+  const router = useRouter();
 
   const books: Book[] = Array.isArray(booksData?.data?.content) 
     ? booksData.data.content 
@@ -241,6 +243,12 @@ function BooksTableSection({
                     title="Chỉnh sửa"
                   >
                     <Edit className="w-4 h-4 text-gray-600" />
+                  </button>
+                  <button
+                    onClick={() => router.push(`/book/chapter?bookId=${book.id}`)}
+                    className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                  >
+                   <BookMarked className="w-4 h-4 text-gray-600" />
                   </button>
                 </div>
               </div>
