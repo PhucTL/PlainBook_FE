@@ -193,19 +193,40 @@ export default function LoginPage() {
           // Lưu token vào localStorage
           const token = response?.data?.token || response?.data?.data?.token;
           const refreshToken = response?.data?.refreshToken || response?.data?.data?.refreshToken;
-          
+
+          // Try to extract role from several possible response shapes
+          const role =
+            response?.data?.role ||
+            response?.data?.data?.role ||
+            response?.data?.data?.user?.role ||
+            response?.role ||
+            response?.data?.user?.role ||
+            null;
+
           if (token) {
             localStorage.setItem('token', token);
           }
           if (refreshToken) {
             localStorage.setItem('refreshToken', refreshToken);
           }
-          
+          if (role) {
+            localStorage.setItem('role', String(role));
+          }
+
+          // Trigger auth-change so LayoutProvider updates immediately
+          window.dispatchEvent(new Event('auth-change'));
+
+          // Determine redirect based on role
+          const normalizedRole = role ? String(role).toUpperCase() : '';
+          const redirectTo = normalizedRole.includes('ADMIN') || normalizedRole.includes('STAFF')
+            ? '/admin/workspace'
+            : '/workspace';
+
           // Hiển thị thông báo thành công
           showSuccess('Đăng nhập thành công! Đang chuyển hướng...');
-          
-          // Redirect đến workspace sau 1.5 giây
-          setTimeout(() => router.push('/workspace'), 1500);
+
+          // Redirect after short delay
+          setTimeout(() => router.push(redirectTo), 1500);
         },
         onError: (error) => {
           logError(error, 'Login');
@@ -231,20 +252,42 @@ export default function LoginPage() {
           // Lưu token vào localStorage
           const token = response?.data?.token || response?.data?.data?.token;
           const refreshToken = response?.data?.refreshToken || response?.data?.data?.refreshToken;
-          console.log('Google login response:', token);
-          
+
+          // Try to extract role from several possible response shapes
+          const role =
+            response?.data?.role ||
+            response?.data?.data?.role ||
+            response?.data?.data?.user?.role ||
+            response?.role ||
+            response?.data?.user?.role ||
+            null;
+
+          console.log('Google login response token:', token, 'role:', role);
+
           if (token) {
             localStorage.setItem('token', token);
           }
           if (refreshToken) {
             localStorage.setItem('refreshToken', refreshToken);
           }
-          
+          if (role) {
+            localStorage.setItem('role', String(role));
+          }
+
+          // Trigger auth-change so LayoutProvider updates immediately
+          window.dispatchEvent(new Event('auth-change'));
+
+          // Determine redirect based on role
+          const normalizedRoleG = role ? String(role).toUpperCase() : '';
+          const redirectToG = normalizedRoleG.includes('ADMIN') || normalizedRoleG.includes('STAFF')
+            ? '/admin/workspace'
+            : '/workspace';
+
           // Hiển thị thông báo thành công
           showSuccess('Đăng nhập Google thành công! Đang chuyển hướng...');
-          
-          // Redirect đến workspace sau 1.5 giây
-          setTimeout(() => router.push('/workspace'), 1500);
+
+          // Redirect after short delay
+          setTimeout(() => router.push(redirectToG), 1500);
         },
         onError: (error) => {
           logError(error, 'Google Login');

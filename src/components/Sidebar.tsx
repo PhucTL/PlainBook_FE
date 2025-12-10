@@ -1,8 +1,9 @@
-'use client';
+"use client";
 
+import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { Database, BookOpen, GraduationCap, FileText, Presentation, Grid3x3, Video, LogOut } from 'lucide-react';
+import { Database, BookOpen, GraduationCap, FileText, Presentation, Grid3x3, LogOut } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 import { useLogoutService } from '@/services/userService';
 import { showSuccess, showError } from '@/lib/toast';
@@ -14,20 +15,41 @@ interface SidebarItem {
   path: string;
 }
 
-const sidebarItems: SidebarItem[] = [
-  // { icon: Database, label: 'Dữ liệu Cơ bản', path: '/data' },
-  // { icon: BookOpen, label: 'Tài liệu Học tập', path: '/learning-materials' },
+// Menus per role
+const teacherItems: SidebarItem[] = [
   { icon: GraduationCap, label: 'Giáo án', path: '/lesson-plans' },
-  { icon: FileText, label: 'Đề thi', path: '/exam' },
   { icon: Presentation, label: 'Slide Bài giảng', path: '/slide' },
+  { icon: FileText, label: 'Đề thi', path: '/exam' },
   { icon: Grid3x3, label: 'Không gian làm việc', path: '/workspace' },
   { icon: BookOpen, label: 'Sách', path: '/book' },
+];
+
+const adminItems: SidebarItem[] = [
+  { icon: GraduationCap, label: 'Giáo án', path: '/admin/lesson-plans' },
+  { icon: FileText, label: 'Đề thi', path: '/admin/exam' },
+  { icon: Presentation, label: 'Slide Bài giảng', path: '/admin/slide' },
+  { icon: Grid3x3, label: 'Không gian làm việc', path: '/admin/workspace' },
+  // { icon: BookOpen, label: 'Sách', path: '/admin/book' },
 ];
 
 export default function Sidebar() {
   const pathname = usePathname();
   const router = useRouter();
   const logoutMutation = useLogoutService();
+  const [role, setRole] = useState<string | null>(null);
+
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem('role');
+      if (stored) {
+        setRole(stored?.toString() ?? null);
+      } else {
+        setRole(null);
+      }
+    } catch (err) {
+      setRole(null);
+    }
+  }, []);
 
   const handleLogout = () => {
     const refreshToken = localStorage.getItem('refreshToken');
@@ -53,6 +75,7 @@ export default function Sidebar() {
           // Clear localStorage
           localStorage.removeItem('token');
           localStorage.removeItem('refreshToken');
+          localStorage.removeItem('role');
           
           // Trigger auth-change event
           window.dispatchEvent(new Event('auth-change'));
@@ -80,6 +103,21 @@ export default function Sidebar() {
     );
   };
 
+  // Decide which menu to show (teacher vs admin/staff)
+  const normalizedRole = role ? role.toUpperCase() : null;
+  let itemsToRender: SidebarItem[] = teacherItems; // default to teacher view
+
+  if (normalizedRole) {
+    if (normalizedRole.includes('TEACHER')) {
+      itemsToRender = teacherItems;
+    } else if (normalizedRole.includes('ADMIN') || normalizedRole.includes('STAFF')) {
+      itemsToRender = adminItems;
+    } else {
+      // Unknown role: default to teacherItems (safer than admin)
+      itemsToRender = teacherItems;
+    }
+  }
+
   return (
     <aside className="w-64 bg-white border-r border-gray-200 h-screen flex flex-col fixed left-0 top-0">
       {/* Logo Section */}
@@ -94,10 +132,10 @@ export default function Sidebar() {
 
       {/* Navigation Items */}
       <nav className="flex-1 py-4 overflow-y-auto">
-        {sidebarItems.map((item) => {
+        {itemsToRender.map((item) => {
           const Icon = item.icon;
           const isActive = pathname === item.path;
-          
+
           return (
             <Link
               key={item.label}
