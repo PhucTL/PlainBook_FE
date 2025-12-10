@@ -1,6 +1,7 @@
 import {
   createMutationHook,
   createQueryHook,
+  createDynamicQueryHook,
   createQueryWithPathParamHook,
   deleteMutationHook,
   patchMutationHook,
@@ -23,7 +24,7 @@ export const useUpdateFormService = updateMutationHook(
 );
 
 //GET ALL LESSON PLAN
-export const useLessonPlanService = createQueryHook(
+export const useLessonPlanService = createDynamicQueryHook(
   "lesson-plan",
   API_ENDPOINTS.LESSON_PLANS.BASE
 );
@@ -50,6 +51,12 @@ export const useLessonPlanActiveService = createQueryHook(
   `${API_ENDPOINTS.LESSON_PLANS.BASE}?status=ACTIVE`
 );
 export const useUpdateLessonPlanStatus = patchMutationHook(
+  "lesson-plan",
+  API_ENDPOINTS.LESSON_PLANS.BASE
+);
+
+//UPDATE LESSON PLAN (PUT)
+export const useUpdateLessonPlanService = updateMutationHook(
   "lesson-plan",
   API_ENDPOINTS.LESSON_PLANS.BASE
 );

@@ -17,6 +17,21 @@ const setupInterceptors = (axiosInstance: AxiosInstance) => {
   // Request interceptor
   axiosInstance.interceptors.request.use(
     function (config) {
+      try {
+        if (typeof window !== 'undefined') {
+          // Log method, url and payload for debugging (temporary)
+          // eslint-disable-next-line no-console
+          console.debug('[API Request]', {
+            method: config.method,
+            baseURL: config.baseURL,
+            url: config.url,
+            params: config.params,
+            data: config.data,
+          });
+        }
+      } catch (e) {
+        // ignore logging errors
+      }
       if (typeof window !== 'undefined') {
         const token = localStorage.getItem("token");
         if (token) {

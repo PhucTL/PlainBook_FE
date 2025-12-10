@@ -1,226 +1,86 @@
 'use client';
 
-import { useState } from 'react';
+import Link from 'next/link';
 import AnimatedSection from '@/components/animation/AnimatedSection';
-import { examConfig } from '@/config/examConfig';
-import { Search, Plus, Upload, Edit, Copy, Trash2, Filter, Eye } from 'lucide-react';
-import Pagination from '@/components/ui/Pagination';
+import { FileText, Layers, PlayCircle, ClipboardList } from 'lucide-react';
 
 export default function AdminExamPage() {
-  const [activeFilter, setActiveFilter] = useState('all');
-  const [searchQuery, setSearchQuery] = useState('');
-  const [currentPage, setCurrentPage] = useState(1);
-
   return (
     <div className="flex flex-col">
-      <MainContentSection 
-        activeFilter={activeFilter}
-        setActiveFilter={setActiveFilter}
-        searchQuery={searchQuery}
-        setSearchQuery={setSearchQuery}
-        currentPage={currentPage}
-        setCurrentPage={setCurrentPage}
-      />
-    </div>
-  );
-}
-
-function MainContentSection({ 
-  activeFilter, 
-  setActiveFilter,
-  searchQuery,
-  setSearchQuery,
-  currentPage,
-  setCurrentPage
-}: { 
-  activeFilter: string; 
-  setActiveFilter: (filter: string) => void;
-  searchQuery: string;
-  setSearchQuery: (query: string) => void;
-  currentPage: number;
-  setCurrentPage: (page: number) => void;
-}) {
-  return (
-    <main className="flex-1 p-8">
-      <HeaderSection />
-      <SearchAndFilterSection 
-        activeFilter={activeFilter}
-        setActiveFilter={setActiveFilter}
-        searchQuery={searchQuery}
-        setSearchQuery={setSearchQuery}
-      />
-      <ExamTableSection 
-        activeFilter={activeFilter} 
-        searchQuery={searchQuery}
-        currentPage={currentPage}
-        setCurrentPage={setCurrentPage}
-      />
-    </main>
-  );
-}
-
-function HeaderSection() {
-  return (
-    <AnimatedSection animation="fade-up" className="mb-8">
-      <div className="flex items-center justify-between">
-        <div className="flex flex-col">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Quản lý Đề thi</h1>
-          <p className="text-gray-600">Quản lý và giám sát tất cả đề thi trong hệ thống.</p>
-        </div>
-        
-        {/* Actions */}
-        <div className="flex items-center gap-3">
-          <button className="px-6 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium flex items-center gap-2">
-            <Upload className="w-5 h-5" />
-            {examConfig.header.uploadButtonText}
-          </button>
-          <button className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium flex items-center gap-2">
-            <Plus className="w-5 h-5" />
-            {examConfig.header.createButtonText}
-          </button>
-        </div>
-      </div>
-    </AnimatedSection>
-  );
-}
-
-function SearchAndFilterSection({
-  searchQuery,
-  setSearchQuery
-}: {
-  activeFilter: string;
-  setActiveFilter: (filter: string) => void;
-  searchQuery: string;
-  setSearchQuery: (query: string) => void;
-}) {
-  return (
-    <AnimatedSection animation="fade-up" delay={100} className="mb-6">
-      <div className="flex items-center justify-between gap-4">
-        {/* Search */}
-        <div className="flex-1 max-w-xl">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-            <input
-              type="text"
-              placeholder="Tìm kiếm đề thi..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
-        </div>
-        <button className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors flex items-center gap-2">
-          <Filter className="w-5 h-5" />
-          Bộ lọc
-        </button>
-      </div>
-    </AnimatedSection>
-  );
-}
-
-function ExamTableSection({ 
-  activeFilter, 
-  searchQuery,
-  currentPage,
-  setCurrentPage
-}: { 
-  activeFilter: string; 
-  searchQuery: string;
-  currentPage: number;
-  setCurrentPage: (page: number) => void;
-}) {
-  const filteredExams = examConfig.exams.filter((exam) => {
-    const matchesFilter = activeFilter === 'all' || exam.status === activeFilter;
-    const matchesSearch = exam.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         exam.subject.toLowerCase().includes(searchQuery.toLowerCase());
-    return matchesFilter && matchesSearch;
-  });
-
-  const { itemsPerPage } = examConfig.pagination;
-  const totalPages = Math.ceil(filteredExams.length / itemsPerPage);
-  
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const endIndex = startIndex + itemsPerPage;
-  const currentItems = filteredExams.slice(startIndex, endIndex);
-
-  return (
-    <AnimatedSection animation="fade-up" delay={200}>
-      <div className="bg-white rounded-xl shadow-sm overflow-hidden">
-        {/* Table Header */}
-        <div className="grid grid-cols-12 gap-4 px-6 py-4 bg-gray-50 border-b border-gray-200 font-medium text-sm text-gray-700">
-          <div className="col-span-3">TÊN ĐỀ THI</div>
-          <div className="col-span-2">MÔN HỌC</div>
-          <div className="col-span-2">NGÀY TẠO</div>
-          <div className="col-span-2">TRẠNG THÁI</div>
-          <div className="col-span-3 text-right">HÀNH ĐỘNG</div>
-        </div>
-
-        {/* Table Body */}
-        <div className="divide-y divide-gray-200">
-          {currentItems.length === 0 ? (
-            <div className="px-6 py-12 text-center text-gray-500">
-              Không tìm thấy đề thi nào
+      <main className="flex-1 p-8">
+        <AnimatedSection animation="fade-up" className="mb-8">
+          <div className="flex items-center justify-between">
+            <div className="flex flex-col">
+              <h1 className="text-3xl font-bold text-gray-900 mb-2">Quản lý Đề thi</h1>
+              <p className="text-gray-600">Chọn loại quản lý bạn muốn truy cập.</p>
             </div>
-          ) : (
-            currentItems.map((exam) => (
-              <div
-                key={exam.id}
-                className="grid grid-cols-12 gap-4 px-6 py-4 hover:bg-gray-50 transition-colors"
-              >
-                <div className="col-span-3 font-medium text-gray-900">{exam.title}</div>
-                <div className="col-span-2 text-gray-600">{exam.subject}</div>
-                <div className="col-span-2 text-gray-600">{exam.date}</div>
-                <div className="col-span-2">
-                  <span
-                    className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${
-                      exam.status === 'published'
-                        ? 'bg-green-100 text-green-700'
-                        : 'bg-yellow-100 text-yellow-700'
-                    }`}
-                  >
-                    {exam.statusText}
-                  </span>
+          </div>
+        </AnimatedSection>
+
+        <AnimatedSection animation="fade-up" delay={100}>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <Link href="/admin/exam/exam-template" className="block">
+              <div className="bg-white rounded-xl shadow-sm p-6 hover:shadow-md transition-shadow h-full flex flex-col justify-between">
+                <div>
+                  <div className="inline-flex items-center justify-center w-10 h-10 rounded-md bg-blue-50 mb-4">
+                    <FileText className="w-5 h-5 text-blue-600" />
+                  </div>
+                  <h3 className="text-lg font-semibold text-gray-900">Mẫu Đề</h3>
+                  <p className="text-sm text-gray-600 mt-2">Quản lý các mẫu đề thi tái sử dụng và cấu trúc đề.</p>
                 </div>
-                <div className="col-span-3 flex items-center justify-end gap-2">
-                  <button
-                    className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-                    title="Xem chi tiết"
-                  >
-                    <Eye className="w-4 h-4 text-gray-600" />
-                  </button>
-                  <button
-                    className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-                    title="Chỉnh sửa"
-                  >
-                    <Edit className="w-4 h-4 text-gray-600" />
-                  </button>
-                  <button
-                    className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-                    title="Sao chép"
-                  >
-                    <Copy className="w-4 h-4 text-gray-600" />
-                  </button>
-                  <button
-                    className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-                    title="Xóa"
-                  >
-                    <Trash2 className="w-4 h-4 text-gray-600" />
-                  </button>
+                <div className="mt-4">
+                  <div className="text-sm text-blue-600 font-medium">Đi tới Mẫu Đề →</div>
                 </div>
               </div>
-            ))
-          )}
-        </div>
-      </div>
+            </Link>
 
-      {/* Pagination */}
-      {totalPages > 1 && (
-        <Pagination
-          currentPage={currentPage}
-          totalPages={totalPages}
-          onPageChange={setCurrentPage}
-        />
-      )}
-    </AnimatedSection>
+            <Link href="/admin/exam/exam-matrix" className="block">
+              <div className="bg-white rounded-xl shadow-sm p-6 hover:shadow-md transition-shadow h-full flex flex-col justify-between">
+                <div>
+                  <div className="inline-flex items-center justify-center w-10 h-10 rounded-md bg-indigo-50 mb-4">
+                    <Layers className="w-5 h-5 text-indigo-600" />
+                  </div>
+                  <h3 className="text-lg font-semibold text-gray-900">Ma trận Đề</h3>
+                  <p className="text-sm text-gray-600 mt-2">Thiết lập ma trận, phân bổ điểm và chuẩn chương trình cho đề thi.</p>
+                </div>
+                <div className="mt-4">
+                  <div className="text-sm text-indigo-600 font-medium">Đi tới Ma trận Đề →</div>
+                </div>
+              </div>
+            </Link>
+
+            <Link href="/admin/exam/exam-instance" className="block">
+              <div className="bg-white rounded-xl shadow-sm p-6 hover:shadow-md transition-shadow h-full flex flex-col justify-between">
+                <div>
+                  <div className="inline-flex items-center justify-center w-10 h-10 rounded-md bg-emerald-50 mb-4">
+                    <PlayCircle className="w-5 h-5 text-emerald-600" />
+                  </div>
+                  <h3 className="text-lg font-semibold text-gray-900">Phiên Thi</h3>
+                  <p className="text-sm text-gray-600 mt-2">Quản lý các lần tổ chức đề thi (instance), lịch và kết quả.</p>
+                </div>
+                <div className="mt-4">
+                  <div className="text-sm text-emerald-600 font-medium">Đi tới Phiên Thi →</div>
+                </div>
+              </div>
+            </Link>
+
+            <Link href="/admin/exam/question-bank" className="block">
+              <div className="bg-white rounded-xl shadow-sm p-6 hover:shadow-md transition-shadow h-full flex flex-col justify-between">
+                <div>
+                  <div className="inline-flex items-center justify-center w-10 h-10 rounded-md bg-green-50 mb-4">
+                    <ClipboardList className="w-5 h-5 text-green-600" />
+                  </div>
+                  <h3 className="text-lg font-semibold text-gray-900">Ngân hàng Câu hỏi</h3>
+                  <p className="text-sm text-gray-600 mt-2">Quản lý câu hỏi, phân loại và tái sử dụng cho đề thi.</p>
+                </div>
+                <div className="mt-4">
+                  <div className="text-sm text-green-600 font-medium">Đi tới Ngân hàng Câu hỏi →</div>
+                </div>
+              </div>
+            </Link>
+          </div>
+        </AnimatedSection>
+      </main>
+    </div>
   );
 }

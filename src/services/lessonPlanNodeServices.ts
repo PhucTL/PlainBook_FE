@@ -1,4 +1,4 @@
-import { createMutationHook, createQueryHook, updateMutationHook } from "@/hooks/react-query";
+import { createMutationHook, createQueryHook, updateMutationHook, deleteMutationHook, createDynamicQueryHook } from "@/hooks/react-query";
 import { API_ENDPOINTS } from "@/constants/apiEndpoints";
 
 export const useCreateLessonPlanNodeService = createMutationHook(
@@ -17,13 +17,19 @@ export const useLessonPlanNodeChildrenService = (id: string) =>
     `lesson-plan-node-chidren-${id}`,
     API_ENDPOINTS.LESSON_PLANS.CHIDREN(id)
   );
-export const useLessonPlanAllNodeService = (id: string) =>
-  createQueryHook(
-    `lesson-plan-node-tree-${id}`,
-    API_ENDPOINTS.LESSON_PLANS.ALL_NODES(id)
+
+export const useLessonPlanAllNodeService = (id?: string) =>
+  createDynamicQueryHook(
+    "lesson-plan-all-nodes",
+    id ? API_ENDPOINTS.LESSON_PLANS.ALL_NODES(id) : ""
   );
 
 export const useUpdateLessonPlanNodeService = updateMutationHook(
+  "lesson-plan-node",
+  API_ENDPOINTS.LESSON_PLANS.NODES
+);
+
+export const useDeleteLessonPlanNodeService = deleteMutationHook(
   "lesson-plan-node",
   API_ENDPOINTS.LESSON_PLANS.NODES
 );
