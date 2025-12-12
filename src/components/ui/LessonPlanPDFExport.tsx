@@ -44,6 +44,7 @@ export default function LessonPlanPDFExport({
       contentElement.style.position = 'fixed';
       contentElement.style.left = '0';
       contentElement.style.top = '0';
+      // Use A4 width and margins: left 30mm, right 15mm, top/bottom 20mm
       contentElement.style.width = '210mm';
       contentElement.style.height = 'auto';
       contentElement.style.zIndex = '9999';
@@ -94,17 +95,22 @@ export default function LessonPlanPDFExport({
       // Calculate number of pages needed
       const totalPages = Math.ceil(scaledHeight / pdfHeight);
       
-      // Add pages and content
+      // Add pages and content, adding footer page numbers
       for (let page = 0; page < totalPages; page++) {
-        if (page > 0) {
-          pdf.addPage();
-        }
-        
-        // Calculate Y offset for this page
+        // Calculate Y offset for this page (in mm)
         const yOffset = -(page * pdfHeight);
-        
-        // Add the image
+
+        // Add the image for this page view
         pdf.addImage(imgData, 'PNG', 0, yOffset, pdfWidth, scaledHeight);
+
+        // Add footer page number (centered, 10pt)
+        pdf.setFont('helvetica');
+        pdf.setFontSize(10);
+        const pageLabel = `${page + 1} / ${totalPages}`;
+        pdf.text(pageLabel, pdfWidth / 2, pdfHeight - 10, { align: 'center' });
+
+        // Add a new page if more pages remain
+        if (page < totalPages - 1) pdf.addPage();
       }
 
       // Save the PDF
@@ -119,16 +125,16 @@ export default function LessonPlanPDFExport({
   };
 
   const renderNodeContent = (node: LessonPlanNode, level: number = 0) => {
-    // Styling based on node type (without showing badge)
+    // Styling based on node type
     const styles = {
       SECTION: {
-        title: { fontSize: '18px', fontWeight: 'bold', color: '#1F2937', marginBottom: '8px' },
+        title: { fontSize: '18px', fontWeight: 700, color: '#000000', marginBottom: '6px', textTransform: 'uppercase' as const },
       },
       SUBSECTION: {
-        title: { fontSize: '16px', fontWeight: '600', color: '#374151', marginBottom: '6px' },
+        title: { fontSize: '16px', fontWeight: 700, color: '#000000', marginBottom: '5px' },
       },
       LIST_ITEM: {
-        title: { fontSize: '14px', fontWeight: '500', color: '#4B5563', marginBottom: '4px' },
+        title: { fontSize: '13px', fontWeight: 'normal', color: '#000000', marginBottom: '3px' },
       },
     };
 
@@ -139,24 +145,25 @@ export default function LessonPlanPDFExport({
       <div 
         key={node.id} 
         style={{ 
-          marginLeft: `${level * 20}px`,
-          marginBottom: '10px',
-          paddingBottom: '6px',
+          marginLeft: `${level * 15}px`,
+          marginBottom: '8px',
           pageBreakInside: 'avoid',
         }}
       >
-        <h3 style={style.title}>
+        <div style={style.title}>
           {isListItem && '- '}{node.title}
-        </h3>
+        </div>
         
         {node.content && (
           <div style={{
-            color: '#4B5563',
-            fontSize: '13px',
-            lineHeight: '1.6',
-            marginTop: '6px',
+            color: '#000000',
+            fontSize: '13pt',
+            lineHeight: '1.3',
+            marginTop: '3px',
             whiteSpace: 'pre-wrap',
-            marginLeft: isListItem ? '10px' : '0',
+            textAlign: 'justify' as const,
+            textIndent: '12.7mm', // 1.27cm first-line indent
+            marginLeft: isListItem ? '8px' : '0',
           }}>
             {node.content}
           </div>
@@ -164,19 +171,21 @@ export default function LessonPlanPDFExport({
         
         {node.description && (
           <div style={{
-            color: '#9CA3AF',
-            fontSize: '12px',
+            color: '#000000',
+            fontSize: '12pt',
             fontStyle: 'italic',
-            marginTop: '4px',
-            lineHeight: '1.5',
-            marginLeft: isListItem ? '10px' : '0',
+            marginTop: '2px',
+            lineHeight: '1.3',
+            textAlign: 'justify' as const,
+            textIndent: '12.7mm',
+            marginLeft: isListItem ? '8px' : '0',
           }}>
             {node.description}
           </div>
         )}
 
         {node.children && node.children.length > 0 && (
-          <div style={{ marginTop: '10px' }}>
+          <div style={{ marginTop: '6px' }}>
             {node.children.map((child) => renderNodeContent(child, level + 1))}
           </div>
         )}
@@ -218,36 +227,33 @@ export default function LessonPlanPDFExport({
         }}
       >
         <div style={{ 
-          padding: '15mm 20mm',
-          fontFamily: 'Arial, sans-serif',
+          padding: '20mm 15mm 20mm 30mm',
+          fontFamily: 'Times New Roman, serif',
           color: '#000000',
+          fontSize: '13pt',
+          lineHeight: '1.3',
         }}>
           {/* Header */}
           <div style={{
             textAlign: 'center',
-            marginBottom: '20px',
-            paddingBottom: '15px',
-            borderBottom: '3px solid #3B82F6',
+            marginBottom: '15px',
           }}>
             <h1 style={{
-              fontSize: '26px',
-              fontWeight: 'bold',
-              color: '#111827',
-              marginBottom: '10px',
-              textTransform: 'uppercase',
+                fontSize: '22px',
+                fontWeight: 700,
+                color: '#000000',
+                marginBottom: '8px',
+                textTransform: 'uppercase',
+                letterSpacing: '0.5px',
             }}>
               {templateName}
             </h1>
             <div style={{
-              display: 'inline-block',
-              background: '#F3F4F6',
-              padding: '8px 16px',
-              borderRadius: '8px',
-              color: '#374151',
+              color: '#000000',
               fontSize: '12px',
-              fontWeight: '500',
+              marginTop: '5px',
             }}>
-              📅 Ngày xuất: {new Date().toLocaleDateString('vi-VN', {
+              Ngày xuất: {new Date().toLocaleDateString('vi-VN', {
                 day: '2-digit',
                 month: '2-digit',
                 year: 'numeric',
@@ -256,20 +262,8 @@ export default function LessonPlanPDFExport({
           </div>
 
           {/* Content */}
-          <div style={{ marginTop: '20px' }}>
+          <div style={{ marginTop: '15px' }}>
             {nodes.map((node) => renderNodeContent(node, 0))}
-          </div>
-
-          {/* Footer */}
-          <div style={{
-            marginTop: '40px',
-            paddingTop: '15px',
-            borderTop: '1px solid #E5E7EB',
-            textAlign: 'center',
-            color: '#9CA3AF',
-            fontSize: '10px',
-          }}>
-            <p>© {new Date().getFullYear()} PlainBook - Hệ thống quản lý giáo án điện tử</p>
           </div>
         </div>
       </div>

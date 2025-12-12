@@ -5,6 +5,7 @@ import AnimatedSection from '@/components/animation/AnimatedSection';
 import Modal from '@/components/ui/Modal';
 import VerifyModal from '@/components/ui/VerifyModal';
 import LessonPlanPDFExport from '@/components/ui/LessonPlanPDFExport';
+import LessonPlanWordExport from '@/components/ui/LessonPlanWordExport';
 import { Search, Plus, Edit, Trash2, ChevronRight, ChevronDown, Loader2 } from 'lucide-react';
 import {
   useLessonPlanAllNodeService,
@@ -252,6 +253,10 @@ function HeaderSection({
           <p className="text-black text-sm">Quản lý cấu trúc node/khối trong mẫu giáo án</p>
         </div>
         <div className="flex items-center gap-3">
+          <LessonPlanWordExport 
+            nodes={nodes}
+            templateName={templateName}
+          />
           <LessonPlanPDFExport 
             nodes={nodes}
             templateName={templateName}
