@@ -4,6 +4,7 @@ import { useState, useMemo } from 'react';
 import AnimatedSection from '@/components/animation/AnimatedSection';
 import Modal from '@/components/ui/Modal';
 import VerifyModal from '@/components/ui/VerifyModal';
+import LessonPlanPDFExport from '@/components/ui/LessonPlanPDFExport';
 import { Search, Plus, Edit, Trash2, ChevronRight, ChevronDown, Loader2 } from 'lucide-react';
 import {
   useLessonPlanAllNodeService,
@@ -91,6 +92,10 @@ function MainContentSection({
 
   const templates: Template[] = templatesData?.data?.content || [];
   const nodes: LessonPlanNode[] = nodesData?.data || [];
+  
+  // Get selected template name
+  const selectedTemplate = templates.find(t => t.id === selectedTemplateId);
+  const templateName = selectedTemplate?.name || 'Giáo án';
 
   // Filter nodes by search
   const filteredNodes = useMemo(() => {
@@ -186,7 +191,11 @@ function MainContentSection({
 
   return (
     <main className="flex-1 p-8">
-      <HeaderSection onCreate={handleCreateRoot} />
+      <HeaderSection 
+        onCreate={handleCreateRoot}
+        nodes={nodes}
+        templateName={templateName}
+      />
       <TemplateSelectSection
         templates={templates}
         selectedTemplateId={selectedTemplateId}
@@ -226,7 +235,15 @@ function MainContentSection({
   );
 }
 
-function HeaderSection({ onCreate }: { onCreate: () => void }) {
+function HeaderSection({ 
+  onCreate, 
+  nodes, 
+  templateName 
+}: { 
+  onCreate: () => void;
+  nodes: LessonPlanNode[];
+  templateName: string;
+}) {
   return (
     <AnimatedSection animation="fade-up" className="mb-8">
       <div className="flex items-center justify-between">
@@ -234,13 +251,19 @@ function HeaderSection({ onCreate }: { onCreate: () => void }) {
           <h1 className="text-3xl font-bold text-black mb-2">Quản lý Node Giáo án</h1>
           <p className="text-black text-sm">Quản lý cấu trúc node/khối trong mẫu giáo án</p>
         </div>
-        <button
-          onClick={onCreate}
-          className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium flex items-center gap-2"
-        >
-          <Plus className="w-5 h-5" />
-          Tạo Node gốc
-        </button>
+        <div className="flex items-center gap-3">
+          <LessonPlanPDFExport 
+            nodes={nodes}
+            templateName={templateName}
+          />
+          <button
+            onClick={onCreate}
+            className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium flex items-center gap-2"
+          >
+            <Plus className="w-5 h-5" />
+            Tạo Node gốc
+          </button>
+        </div>
       </div>
     </AnimatedSection>
   );
