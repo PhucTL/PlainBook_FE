@@ -3,18 +3,23 @@
 import { useState } from 'react';
 import AnimatedSection from '@/components/animation/AnimatedSection';
 import Pagination from '@/components/ui/Pagination';
-import { Search, Plus, Edit, Trash2, Loader2 } from 'lucide-react';
+import { Search, Plus, Edit, Trash2, Loader2, Sparkles } from 'lucide-react';
 import Table from '@/components/Table';
 import Modal from '@/components/ui/Modal';
 import VerifyModal from '@/components/ui/VerifyModal';
+import CreateAILessonModal from '@/components/ui/CreateAILessonModal';
+import AIGenerationModal from '@/components/ui/AIGenerationModal';
+import type { CreateAILessonFormData } from '@/components/ui/CreateAILessonModal';
 import {
   useLessonPlanService,
   useCreateLessonPlanService,
   useUpdateLessonPlanService,
   useDeleteLessonPlanService,
 } from '@/services/lessonPlanServices';
+import { useAILessonGeneration } from '@/hooks/useAILessonGeneration';
 import { showSuccess, showError } from '@/lib/toast';
 import { logError } from '@/lib/middleware';
+import { useRouter } from 'next/navigation';
 
 interface LessonPlanTemplate {
   id: number;
@@ -52,9 +57,21 @@ function MainContentSection({
   currentPage: number;
   setCurrentPage: (p: number) => void;
 }) {
+  const router = useRouter();
   const [pageSize] = useState(10);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isAIModalOpen, setIsAIModalOpen] = useState(false);
   const [editingTemplate, setEditingTemplate] = useState<LessonPlanTemplate | null>(null);
+
+  // AI Generation Hook
+  const {
+    generate: generateAI,
+    isGenerating,
+    currentProgress,
+    error: aiError,
+    result: aiResult,
+    reset: resetAI,
+  } = useAILessonGeneration();
 
   // use dynamic hook: dependencies?, options?, params?
   const { data: templatesData, isLoading, refetch } = useLessonPlanService(
@@ -74,6 +91,36 @@ function MainContentSection({
   const handleCreate = () => {
     setEditingTemplate(null);
     setIsModalOpen(true);
+  };
+
+  const handleCreateWithAI = () => {
+    resetAI();
+    setIsAIModalOpen(true);
+  };
+
+  const handleAISubmit = async (formData: CreateAILessonFormData) => {
+    setIsAIModalOpen(false);
+    
+    try {
+      // Get user ID from localStorage or context
+      const userId = localStorage.getItem('userId') || 'user123';
+      
+      const result = await generateAI({
+        templateName: formData.templateName,
+        templateDescription: formData.templateDescription,
+        nodes: formData.nodes,
+        lessonId: formData.lessonId,
+        bookId: formData.bookId,
+        userId,
+        toolLogId: Date.now(),
+      });
+
+      showSuccess('Giáo án AI đã được tạo thành công!');
+      refetch();
+    } catch (error) {
+      logError(error, 'AI Lesson Generation');
+      showError(aiError?.message || 'Tạo giáo án AI thất bại!');
+    }
   };
 
   const handleEdit = (template: LessonPlanTemplate) => {
@@ -121,7 +168,7 @@ function MainContentSection({
 
   return (
     <main className="flex-1 p-8">
-      <HeaderSection onCreate={handleCreate} />
+      <HeaderSection onCreate={handleCreate} onCreateWithAI={handleCreateWithAI} />
       <SearchAndFilterSection searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
       <LessonPlansTableSection
         searchQuery={searchQuery}
@@ -136,10 +183,30 @@ function MainContentSection({
         onOpenCreate={() => setIsModalOpen(true)}
       />
 
-      {/* Modal stays here so header button can open it */}
+      {/* Manual Create Modal */}
       {isModalOpen && (
         <LessonPlanModal template={editingTemplate} onClose={() => setIsModalOpen(false)} onSubmit={handleSubmit} isSubmitting={createMutation.isPending || updateMutation.isPending} />
       )}
+      
+      {/* AI Create Modal */}
+      <CreateAILessonModal
+        isOpen={isAIModalOpen}
+        onClose={() => setIsAIModalOpen(false)}
+        onSubmit={handleAISubmit}
+        isSubmitting={false}
+      />
+
+      {/* AI Generation Progress Modal */}
+      <AIGenerationModal
+        isOpen={isGenerating || !!aiError || (!!aiResult && currentProgress?.progress === 100)}
+        onClose={() => {
+          resetAI();
+        }}
+        progress={currentProgress}
+        isGenerating={isGenerating}
+        error={aiError}
+      />
+      
       {/* Verify delete modal */}
       <VerifyModal
         isOpen={!!verifyTarget}
@@ -155,7 +222,7 @@ function MainContentSection({
   );
 }
 
-function HeaderSection({ onCreate }: { onCreate?: () => void }) {
+function HeaderSection({ onCreate, onCreateWithAI }: { onCreate?: () => void; onCreateWithAI?: () => void }) {
   return (
     <AnimatedSection animation="fade-up" className="mb-8">
       <div className="flex items-center justify-between">
@@ -167,7 +234,15 @@ function HeaderSection({ onCreate }: { onCreate?: () => void }) {
         <div className="flex items-center gap-3">
           <button onClick={() => onCreate?.()} className="px-6 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium flex items-center gap-2">
             <Plus className="w-5 h-5" />
-            Tạo mới
+            Tạo thủ công
+          </button>
+          
+          <button 
+            onClick={() => onCreateWithAI?.()} 
+            className="px-6 py-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg hover:from-blue-700 hover:to-purple-700 transition-all font-medium flex items-center gap-2 shadow-md hover:shadow-lg"
+          >
+            <Sparkles className="w-5 h-5" />
+            Tạo với AI
           </button>
         </div>
       </div>

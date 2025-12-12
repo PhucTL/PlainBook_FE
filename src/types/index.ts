@@ -570,3 +570,128 @@ export interface ToolLog {
   createdAt: string;
   updatedAt: string;
 }
+
+// AI Lesson Plan Generation Types (Based on lesson-ai.md)
+export interface LessonPlanNode {
+  id?: number | string;
+  springboot_node_id?: number | string; // ✅ Top-level field để FastAPI preserve
+  lessonPlanTemplateId?: number;
+  parentId?: number | null;
+  title: string;
+  content: string;
+  description?: string;
+  fieldType: "INPUT" | "UPLOAD"; // Chỉnh theo Swagger API
+  type: "SECTION" | "SUBSECTION" | "LIST_ITEM" | "PARAGRAPH"; // ✅ Backend chỉ chấp nhận 4 types này (KHÔNG có TABLE, KHÔNG có ROOT)
+  orderIndex: number;
+  metadata?: {
+    ai_enabled?: boolean;
+    expected_length?: "short" | "medium" | "long";
+    springboot_node_id?: number | string;
+    original_title?: string; // Backup title
+    ai_generated?: boolean;
+    word_count?: number;
+  };
+  status?: "ACTIVE" | "INACTIVE" | "DELETED";
+  children?: LessonPlanNode[];
+  createdAt?: string;
+  updatedAt?: string;
+  data?: any; // For SpringBoot response wrapper
+}
+
+export interface AILessonPlanStructure {
+  id: string;
+  title: string;
+  type: "SECTION" | "SUBSECTION" | "PARAGRAPH" | "LIST_ITEM"; // ✅ Backend chỉ chấp nhận 4 types (KHÔNG có TABLE, KHÔNG có ROOT)
+  status: "ACTIVE" | "INACTIVE" | "DELETED"; // ✅ BẮT BUỘC theo FastAPI schema
+  children: LessonPlanNode[];
+}
+
+export interface CreateLessonPlanTemplateRequest {
+  name: string;
+  description?: string;
+}
+
+export interface CreateLessonPlanTemplateResponse {
+  statusCode?: number;
+  message?: string;
+  data?: {
+    id: number;
+    name: string;
+    description?: string;
+    status: "ACTIVE" | "INACTIVE" | "DRAFT" | "PUBLISHED" | "ARCHIVED";
+    createdAt: string;
+    updatedAt: string;
+  };
+  // Fallback for direct response
+  id?: number;
+  name?: string;
+  description?: string;
+  status?: "ACTIVE" | "INACTIVE" | "DRAFT" | "PUBLISHED" | "ARCHIVED";
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface CreateLessonNodeRequest {
+  lessonPlanTemplateId: number; // ⚠️ Schema definition dùng lessonPlanTemplateId (example dùng lessonPlanId nhưng착 SAI)
+  parentId?: number | null;
+  title: string;
+  content?: string; // Optional theo Swagger
+  description?: string;
+  fieldType: "INPUT" | "UPLOAD"; // Chỉnh theo Swagger API
+  type: "SECTION" | "SUBSECTION" | "LIST_ITEM" | "PARAGRAPH";
+  orderIndex: number;
+  // metadata KHÔNG GỬI trong request - SpringBoot không hỗ trợ
+}
+
+export interface UpdateLessonNodeRequest {
+  title?: string;
+  content?: string;
+  description?: string;
+  fieldType: "INPUT" | "UPLOAD"; // Bắt buộc theo Swagger
+  type?: "SECTION" | "SUBSECTION" | "LIST_ITEM" | "PARAGRAPH";
+  orderIndex?: number;
+  // metadata KHÔNG sử dụng - SpringBoot API không hỗ trợ tốt
+}
+
+export interface GenerateAIContentRequest {
+  lesson_plan_json: AILessonPlanStructure;
+  lesson_id?: string;
+  book_id?: string;
+  user_id: string;
+  tool_log_id?: number;
+}
+
+export interface GenerateAIContentResponse {
+  task_id: string;
+  status: "processing" | "completed" | "failed";
+  message: string;
+  created_at: string;
+}
+
+export interface TaskStatusResponse {
+  task_id: string;
+  status: "processing" | "completed" | "failed";
+  progress: number;
+  message: string;
+  created_at: string;
+  updated_at?: string;
+  completed_at?: string;
+  result?: {
+    success: boolean;
+    output: AILessonPlanStructure;
+    statistics: {
+      total_nodes: number;
+      content_nodes_processed: number;
+      lesson_content_used: boolean;
+      total_words: number;
+      processing_time_seconds: number;
+    };
+    total_count: number;
+  };
+  error?: string;
+  data?: {
+    lesson_plan_json: AILessonPlanStructure;
+    lesson_id?: string;
+    user_id: string;
+  };
+}

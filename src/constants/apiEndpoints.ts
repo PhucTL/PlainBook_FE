@@ -109,8 +109,13 @@ export const API_ENDPOINTS = {
       ),
   },
 
-  LESSON_PLAN_GENERATION: "/lesson/generate-lesson-plan-content",
-  UPLOAD_DOCX_TO_ONLINE: "/lesson/upload-docx-to-online",
+  // AI Lesson Plan Generation (FastAPI - Port 8000)
+  LESSON_PLAN_GENERATION: "/api/v1/lesson/generate-lesson-plan-content",
+  UPLOAD_DOCX_TO_ONLINE: "/api/v1/lesson/upload-docx-to-online",
+  
+  // AI Task Status (FastAPI - Secondary API Port 8000)
+  AI_TASK_STATUS: (taskId: string) => `/api/v1/tasks/status/${taskId}`,
+  AI_TASK_RESULT: (taskId: string) => `/api/v1/tasks/result/${taskId}`,
 
   // Tags
   TAGS: buildEndpoint(SERVICES.ACADEMIC_RESOURCE, "/tags"),
