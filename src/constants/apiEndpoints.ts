@@ -117,6 +117,14 @@ export const API_ENDPOINTS = {
   AI_TASK_STATUS: (taskId: string) => `/api/v1/tasks/status/${taskId}`,
   AI_TASK_RESULT: (taskId: string) => `/api/v1/tasks/result/${taskId}`,
 
+  // AI Exam Generation (FastAPI - Port 8000)
+  EXAM: {
+    TEXTBOOK_LESSONS: "/api/v1/pdf/textbook-lessons", // GET lessons by book_id
+    GENERATE_SMART_EXAM: "/api/v1/exam-generation/smart", // POST create exam task
+    TASK_STATUS: (taskId: string) => `/api/v1/tasks/${taskId}`, // GET task status
+    DOWNLOAD_EXAM: (taskId: string) => `/api/v1/tasks/download/${taskId}`, // GET download file
+  },
+
   // Tags
   TAGS: buildEndpoint(SERVICES.ACADEMIC_RESOURCE, "/tags"),
 
@@ -199,11 +207,27 @@ export const ACADEMIC_ANALYSIS_ENDPOINTS = {
   GET_ANALYSIS: (id: string) => `/api/v1/analysis/${id}`,
 } as const;
 
+// AI Exam Generation Endpoints (Secondary API - Port 8000)
+export const AI_EXAM_ENDPOINTS = {
+  // Get available lessons for exam
+  LESSONS: "/api/v1/pdf/lessons", // ✅ Get all lessons
+  TEXTBOOK_LESSONS: "/api/v1/pdf/textbook-lessons", // Deprecated, use LESSONS
+  
+  // Create exam task
+  SMART_EXAM_GENERATION: "/api/v1/exam/generate-smart-exam", // ✅ Updated endpoint
+  
+  // Task status & result
+  EXAM_TASK_STATUS: (taskId: string) => `/api/v1/tasks/status/${taskId}`, // ✅ Fixed: Added /status
+  EXAM_TASK_RESULT: (taskId: string) => `/api/v1/tasks/result/${taskId}`, // ✅ Fixed: Added /result
+  EXAM_TASK_DOWNLOAD: (taskId: string) => `/api/v1/tasks/download/${taskId}`,
+} as const;
+
 // Combined endpoints for easy access
 export const ALL_API_ENDPOINTS = {
   MAIN: API_ENDPOINTS,
   PDF: PDF_API_ENDPOINTS,
   ACADEMIC_ANALYSIS: ACADEMIC_ANALYSIS_ENDPOINTS,
+  AI_EXAM: AI_EXAM_ENDPOINTS,
 } as const;
 
 // Type for API endpoints (optional, for better TypeScript support)

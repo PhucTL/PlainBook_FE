@@ -695,3 +695,112 @@ export interface TaskStatusResponse {
     user_id: string;
   };
 }
+
+// ============================================
+// AI EXAM GENERATION TYPES
+// ============================================
+
+export interface TextbookLesson {
+  lesson_id: string;
+  lesson_name: string;
+  part: string;
+  metadata: {
+    book_id: string;
+    subject: string;
+  };
+}
+
+export interface LessonsResponse {
+  success: boolean;
+  book_id: string;
+  collection_name: string;
+  total_lessons: number;
+  lessons: TextbookLesson[];
+}
+
+export interface ExamObjectives {
+  KNOWLEDGE: number;
+  COMPREHENSION: number;
+  APPLICATION: number;
+}
+
+export interface ExamPart {
+  part: 1 | 2 | 3; // 1: Multiple Choice, 2: True/False, 3: Essay
+  objectives: ExamObjectives;
+}
+
+export interface LessonMatrix {
+  lessonId: string;
+  parts: ExamPart[];
+}
+
+export interface SmartExamRequest {
+  school: string;
+  grade: number; // 1-12
+  subject: string;
+  examTitle: string;
+  duration: number; // 15-180 minutes
+  examCode?: string; // 4 digits, optional - auto random if not provided
+  outputFormat: "docx";
+  outputLink: "online";
+  isExportDocx: boolean;
+  bookID: string;
+  matrix: LessonMatrix[];
+  user_id?: string;
+}
+
+export interface ExamGenerationResponse {
+  success: boolean;
+  task_id: string;
+  task_type: "smart_exam_generation";
+  status: "pending" | "processing" | "completed" | "failed";
+  message: string;
+}
+
+export interface ExamStatistics {
+  total_questions: number;
+  part_1_questions: number; // ✅ Fixed: API uses part_1_questions
+  part_2_questions: number; // ✅ Fixed: API uses part_2_questions
+  part_3_questions: number; // ✅ Fixed: API uses part_3_questions
+  lessons_used: number;
+  difficulty_distribution: {
+    KNOWLEDGE: number;
+    COMPREHENSION: number;
+    APPLICATION: number;
+  };
+  generation_time: number;
+  created_at: string;
+}
+
+export interface ExamTaskResult {
+  exam_id: string;
+  message: string;
+  online_links: Record<string, unknown>;
+  file_path: string;
+  filename: string;
+  statistics: ExamStatistics; // ✅ Fixed: statistics is at output level
+  task_id: string;
+  processing_info: {
+    total_questions_generated: number;
+    total_lessons_used: number;
+    missing_lessons: string[];
+    processing_method: string;
+  };
+}
+
+export interface ExamTaskStatusResponse {
+  success: boolean;
+  task_id: string;
+  task_type: "smart_exam_generation";
+  status: "pending" | "processing" | "completed" | "failed";
+  result: {
+    success?: boolean;
+    current_progress?: string;
+    message?: string;
+    output?: ExamTaskResult;
+    error?: string;
+  };
+  created_at: string;
+  updated_at?: string;
+  completed_at?: string;
+}
