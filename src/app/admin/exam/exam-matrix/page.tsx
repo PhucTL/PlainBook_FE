@@ -1,21 +1,21 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import AnimatedSection from '@/components/animation/AnimatedSection';
 import Modal from '@/components/ui/Modal';
 import VerifyModal from '@/components/ui/VerifyModal';
 import Pagination from '@/components/ui/Pagination';
-import { Search, Plus, Edit, Trash2, Eye, Loader2, Copy, CheckCircle, XCircle } from 'lucide-react';
+import { Search, Plus, Edit, Trash2, Eye, Loader2, CheckCircle, XCircle } from 'lucide-react';
 import {
   useMatrixTemplatesService,
-  useMatrixTemplateByIdService,
+  
   useCreateMatrixTemplateService,
   useUpdateMatrixTemplateService,
   useDeleteMatrixTemplateService,
   useUpdateMatrixTemplateStatusService,
   type MatrixTemplateConfig,
   type MatrixPart,
-  type DifficultyLevel,
+  
 } from '@/services/matrixTemplateServices';
 import { showSuccess, showError } from '@/lib/toast';
 import { logError } from '@/lib/middleware';
@@ -43,6 +43,7 @@ interface MatrixConfig extends MatrixTemplateConfig {
   status: 'ACTIVE' | 'INACTIVE';
   createdAt: string;
   updatedAt: string;
+  matrixJson?: { parts?: MatrixPart[] };
 }
 
 function MainContentSection({
@@ -321,10 +322,10 @@ function MatrixTableSection({
                       <div className="flex items-center gap-2">
                         <span className="text-sm font-medium text-gray-700">Số phần:</span>
                         <span className="px-2 py-0.5 bg-blue-100 text-blue-700 rounded text-sm font-medium">
-                          {matrix.parts?.length || 0}
+                          {(matrix.matrixJson?.parts ?? matrix.parts)?.length || 0}
                         </span>
                       </div>
-                      {matrix.parts?.map((part) => (
+                      {(matrix.matrixJson?.parts ?? matrix.parts)?.map((part) => (
                         <div key={part.id} className={`px-3 py-1 rounded-lg ${part.color} border border-gray-200`}>
                           <span className={`text-sm font-medium ${part.color.replace('bg-', 'text-').replace('-50', '-700')}`}>
                             {part.label}
@@ -384,7 +385,7 @@ function MatrixModal({ matrix, onClose, onSubmit, isSubmitting }: MatrixModalPro
     name: matrix?.name || '',
     description: matrix?.description || '',
     status: matrix?.status || 'ACTIVE',
-    parts: matrix?.parts || [
+    parts: matrix?.matrixJson?.parts || matrix?.parts || [
       {
         id: 'part1',
         name: 'Phần 1',
@@ -717,76 +718,95 @@ function MatrixModal({ matrix, onClose, onSubmit, isSubmitting }: MatrixModalPro
 }
 
 function MatrixDetailModal({ matrix, onClose }: { matrix: MatrixConfig; onClose: () => void }) {
+  const [formData, setFormData] = useState(() => ({
+    name: matrix?.name || '',
+    description: matrix?.description || '',
+    status: matrix?.status || 'ACTIVE',
+    parts: matrix?.matrixJson?.parts || matrix?.parts || [],
+  }));
+
+  useEffect(() => {
+    setFormData({
+      name: matrix?.name || '',
+      description: matrix?.description || '',
+      status: matrix?.status || 'ACTIVE',
+      parts: matrix?.matrixJson?.parts ? JSON.parse(JSON.stringify(matrix.matrixJson.parts)) : JSON.parse(JSON.stringify(matrix?.parts || [])),
+    });
+  }, [matrix]);
+
   return (
     <Modal isOpen={true} onClose={onClose} title="Chi tiết cấu hình ma trận" size="xl">
       <div className="space-y-6">
-        <div>
-          <h3 className="font-semibold text-gray-900 mb-2">Thông tin cơ bản</h3>
-          <div className="bg-gray-50 rounded-lg p-4 space-y-2">
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-gray-600">Tên:</span>
-              <span className="text-sm font-medium text-gray-900">{matrix.name}</span>
+        <form className="space-y-6 max-h-[75vh] overflow-y-auto pr-2">
+          <div className="grid grid-cols-2 gap-4">
+            <div className="col-span-2">
+              <label className="block text-sm font-medium text-gray-700 mb-2">Tên cấu hình</label>
+              <input
+                readOnly
+                value={formData.name}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-white text-gray-900"
+              />
             </div>
-            {matrix.description && (
-              <div className="flex items-start justify-between">
-                <span className="text-sm text-gray-600">Mô tả:</span>
-                <span className="text-sm text-gray-900 text-right flex-1 ml-4">{matrix.description}</span>
-              </div>
-            )}
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-gray-600">Trạng thái:</span>
-              <span
-                className={`px-2 py-1 rounded-full text-xs font-medium ${
-                  matrix.status === 'ACTIVE' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700'
-                }`}
-              >
-                {matrix.status === 'ACTIVE' ? 'Hoạt động' : 'Không hoạt động'}
-              </span>
+
+            <div className="col-span-2">
+              <label className="block text-sm font-medium text-gray-700 mb-2">Mô tả</label>
+              <textarea readOnly value={formData.description} rows={2} className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-white text-gray-900" />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Trạng thái</label>
+              <input readOnly value={formData.status} className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-white text-gray-900" />
             </div>
           </div>
-        </div>
 
-        <div>
-          <h3 className="font-semibold text-gray-900 mb-3">Cấu trúc ma trận ({matrix.parts?.length || 0} phần)</h3>
-          <div className="space-y-4">
-            {matrix.parts?.map((part, index) => (
-              <div key={part.id} className={`${part.color} rounded-lg p-4 border-2 border-gray-200`}>
-                <div className="flex items-center justify-between mb-3">
-                  <div className="flex items-center gap-3">
-                    <span className="text-lg font-bold text-gray-900">#{index + 1}</span>
+          <div className="border-t border-gray-200 pt-6">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">Cấu trúc các phần thi</h3>
+            <div className="space-y-6">
+              {formData.parts.map((part: any, partIndex: number) => (
+                <div key={part.id || partIndex} className={`p-4 ${part.color} rounded-lg border-2 border-gray-200`}>
+                  <div className="flex items-start justify-between mb-4">
                     <div>
-                      <h4 className="font-semibold text-gray-900">{part.name}</h4>
-                      <p className="text-sm text-gray-600">{part.label}</p>
-                    </div>
-                  </div>
-                  {part.maximum && (
-                    <div className="px-3 py-1 bg-white rounded-lg border border-gray-300">
-                      <span className="text-xs text-gray-600">Tối đa:</span>
-                      <span className="ml-1 font-semibold text-gray-900">{part.maximum} câu</span>
-                    </div>
-                  )}
-                </div>
-
-                <div className="bg-white bg-opacity-70 rounded-lg p-3">
-                  <h5 className="text-xs font-semibold text-gray-700 mb-2 uppercase">Mức độ khó</h5>
-                  <div className="grid grid-cols-3 gap-2">
-                    {part.difficultyLevels?.map((level) => (
-                      <div key={level.id} className="bg-white rounded border border-gray-200 p-2">
-                        <div className={`font-medium text-sm ${level.color}`}>{level.name}</div>
-                        <div className="text-xs text-gray-600">{level.label}</div>
+                      <div className="flex items-center gap-3">
+                        <span className="text-lg font-bold text-gray-900">#{partIndex + 1}</span>
+                        <div>
+                          <h4 className="font-semibold text-gray-900">{part.name}</h4>
+                          <p className="text-sm text-gray-600">{part.label}</p>
+                        </div>
                       </div>
-                    ))}
+                    </div>
+                    {part.maximum && (
+                      <div className="px-3 py-1 bg-white rounded-lg border border-gray-300">
+                        <span className="text-xs text-gray-600">Tối đa:</span>
+                        <span className="ml-1 font-semibold text-gray-900">{part.maximum} câu</span>
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="bg-white bg-opacity-70 rounded-lg p-3">
+                    <h5 className="text-xs font-semibold text-gray-700 mb-2 uppercase">Mức độ khó</h5>
+                    <div className="grid grid-cols-3 gap-2">
+                      {part.difficultyLevels?.map((level: any) => (
+                        <div key={level.id} className="bg-white rounded border border-gray-200 p-2">
+                          <div className={`font-medium text-sm ${level.color}`}>{level.name}</div>
+                          <div className="text-xs text-gray-600">{level.label}</div>
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
-        </div>
 
-        <div className="pt-4 border-t border-gray-200 text-sm text-gray-500">
-          <div>Tạo lúc: {new Date(matrix.createdAt).toLocaleString('vi-VN')}</div>
-          {matrix.updatedAt && <div>Cập nhật: {new Date(matrix.updatedAt).toLocaleString('vi-VN')}</div>}
-        </div>
+          <div className="pt-4 border-t border-gray-200 text-sm text-gray-500">
+            <div>Tạo lúc: {new Date(matrix.createdAt).toLocaleString('vi-VN')}</div>
+            {matrix.updatedAt && <div>Cập nhật: {new Date(matrix.updatedAt).toLocaleString('vi-VN')}</div>}
+          </div>
+
+          <div className="flex items-center justify-end gap-3 pt-4">
+            <button onClick={onClose} className="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50">Đóng</button>
+          </div>
+        </form>
       </div>
     </Modal>
   );

@@ -29,7 +29,7 @@ const adminItems: SidebarItem[] = [
   { icon: FileText, label: 'Đề thi', path: '/admin/exam' },
   { icon: Presentation, label: 'Slide Bài giảng', path: '/admin/slide' },
   { icon: Grid3x3, label: 'Không gian làm việc', path: '/admin/workspace' },
-  // { icon: BookOpen, label: 'Sách', path: '/admin/book' },
+  { icon: GraduationCap, label: 'Lớp', path: '/admin/class' },
 ];
 
 export default function Sidebar() {
@@ -126,7 +126,7 @@ export default function Sidebar() {
           <div className="w-8 h-8 bg-blue-600 rounded-md flex items-center justify-center">
             <Grid3x3 className="w-5 h-5 text-white" />
           </div>
-          <span className="text-lg font-bold text-gray-900">Nền tảng học tập</span>
+          <span className="text-lg font-bold text-gray-900">PlainBook</span>
         </Link>
       </div>
 
