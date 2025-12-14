@@ -30,6 +30,8 @@ const adminItems: SidebarItem[] = [
   { icon: Presentation, label: 'Slide Bài giảng', path: '/admin/slide' },
   { icon: Grid3x3, label: 'Không gian làm việc', path: '/admin/workspace' },
   { icon: GraduationCap, label: 'Lớp', path: '/admin/class' },
+  { icon: Database, label: 'Quản lý người dùng', path: '/admin/manage-user' },
+  { icon: BookOpen, label: 'Sách', path: '/admin/book' },
 ];
 
 export default function Sidebar() {
