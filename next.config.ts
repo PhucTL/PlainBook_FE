@@ -1,10 +1,8 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  eslint: {
-    // Skip ESLint during production builds to avoid blocking on legacy lint rules.
-    ignoreDuringBuilds: true,
-  },
+  // Note: eslint.ignoreDuringBuilds is no longer supported in Next.js 16+
+  // ESLint checking can be controlled via the build command or CI pipeline
 };
 
 export default nextConfig;
