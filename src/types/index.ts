@@ -114,23 +114,23 @@ export type SlideTemplateStatus = "ACTIVE" | "INACTIVE";
 export interface CreateSlideTemplateRequest {
   name: string;
   description?: string;
-  textBlocks?: Record<string, any>;
+  textBlocks?: Record<string, unknown>;
   imageBlocks?: Record<string, string>;
 }
 
 export interface UpdateSlideTemplateRequest {
   name?: string;
   description?: string;
-  textBlocks?: Record<string, any>;
+  textBlocks?: Record<string, unknown>;
   imageBlocks?: Record<string, string>;
 }
 
 export interface SlideTemplateResponse {
-  id: any;
+  id: string | number;
   name: string;
   status: SlideTemplateStatus;
   description?: string;
-  textBlocks?: Record<string, any>;
+  textBlocks?: Record<string, unknown>;
   imageBlocks?: Record<string, string>;
   createdAt: string;
   updatedAt: string;
@@ -139,7 +139,7 @@ export interface SlideTemplateResponse {
 // Helper types for form handling
 export interface TextBlockItem {
   key: string;
-  value: any;
+  value: unknown;
 }
 
 export interface ImageBlockItem {
@@ -150,7 +150,7 @@ export interface ImageBlockItem {
 // Types for process JSON template API
 export interface ProcessJsonTemplateRequest {
   lesson_id: string;
-  template: Record<string, any>;
+  template: Record<string, unknown>;
   config_prompt: string;
 }
 
@@ -408,7 +408,7 @@ export interface ToolResultResponse {
   description: string;
   type: string;
   status: "ACTIVE" | "DELETED" | "ARCHIVED" | "DRAFT";
-  data: any[]; // Array of any data structure
+  data: unknown[]; // Array of unknown data structures
   createdAt: string; // ISO date string
   updatedAt: string; // ISO date string
   userId: string;
@@ -565,8 +565,8 @@ export interface ToolLog {
   status: "SUCCESS" | "FAILED" | "PENDING";
   toolType: "EXTERNAL" | "INTERNAL";
   tokenUsed: number;
-  input: any;
-  output: any;
+  input: unknown;
+  output: unknown;
   createdAt: string;
   updatedAt: string;
 }
@@ -595,7 +595,7 @@ export interface LessonPlanNode {
   children?: LessonPlanNode[];
   createdAt?: string;
   updatedAt?: string;
-  data?: any; // For SpringBoot response wrapper
+  data?: unknown; // For SpringBoot response wrapper
 }
 
 export interface AILessonPlanStructure {

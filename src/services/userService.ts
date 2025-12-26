@@ -6,7 +6,6 @@
 
 import {
   createMainMutationHook,
-  createMainQueryHook,
   createMainQueryWithPathParamHook,
   mainApiHooks,
   updateMainMutationHook,
