@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import Modal from "./Modal";
-import type { LessonMatrix, ExamPart, ExamObjectives } from "@/types";
+import type { LessonMatrix, ExamPart, ExamObjectives, TextbookLesson } from "@/types";
 import { getAvailableLessons } from "@/services/aiExamServices";
 import { showError } from "@/lib/toast";
 
@@ -50,11 +50,7 @@ export default function CreateAIExamModal({
   const [bookID, setBookID] = useState(defaultBookID);
 
   // Lessons state
-  const [availableLessons, setAvailableLessons] = useState<Array<{
-    lesson_id: string;
-    lesson_name?: string;
-    book_id: string;
-  }>>([]);
+  const [availableLessons, setAvailableLessons] = useState<TextbookLesson[]>([]);
   const [isLoadingLessons, setIsLoadingLessons] = useState(false);
 
   // Matrix state
@@ -72,8 +68,8 @@ export default function CreateAIExamModal({
     setIsLoadingLessons(true);
     try {
       const response = await getAvailableLessons(bookID);
-      if (response.success && response.data?.lessons) {
-        setAvailableLessons(response.data.lessons);
+      if (response.success && response.lessons) {
+        setAvailableLessons(response.lessons);
       }
     } catch (error) {
       console.error("Error fetching lessons:", error);

@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import Modal from "./Modal";
+import type { CreateExamWithAIResult } from "@/services/aiExamServices";
 import { Download, CheckCircle, XCircle, Loader2 } from "lucide-react";
 
 interface ExamGenerationProgressModalProps {
@@ -10,20 +11,7 @@ interface ExamGenerationProgressModalProps {
     progress: number; // 0-100
     message: string;
   } | null;
-  result: {
-    taskId: string;
-    filename: string;
-    statistics: {
-      total_questions: number;
-      part1_count: number;
-      part2_count: number;
-      part3_count: number;
-      knowledge_count: number;
-      comprehension_count: number;
-      application_count: number;
-    };
-    downloadUrl: string;
-  } | null;
+  result: CreateExamWithAIResult | null;
   error: Error | null;
   isGenerating: boolean;
 }
@@ -110,26 +98,26 @@ export default function ExamGenerationProgressModal({
                 <div className="mt-4 grid grid-cols-2 gap-3">
                   <div className="bg-white rounded-lg p-3 border border-green-100">
                     <p className="text-xs text-gray-600">Tổng số câu</p>
-                    <p className="text-lg font-semibold text-gray-900">
-                      {result.statistics.total_questions}
-                    </p>
+                        <p className="text-lg font-semibold text-gray-900">
+                          {result.statistics.total_questions ?? (result.statistics as any)?.total_questions}
+                        </p>
                   </div>
                   <div className="bg-white rounded-lg p-3 border border-green-100">
                     <p className="text-xs text-gray-600">Part 1 (Trắc nghiệm)</p>
                     <p className="text-lg font-semibold text-gray-900">
-                      {result.statistics.part1_count}
+                      {(result.statistics as any)?.part1_count ?? (result.statistics as any)?.part_1_questions ?? 0}
                     </p>
                   </div>
                   <div className="bg-white rounded-lg p-3 border border-green-100">
                     <p className="text-xs text-gray-600">Part 2 (Đúng/Sai)</p>
                     <p className="text-lg font-semibold text-gray-900">
-                      {result.statistics.part2_count}
+                      {(result.statistics as any)?.part2_count ?? (result.statistics as any)?.part_2_questions ?? 0}
                     </p>
                   </div>
                   <div className="bg-white rounded-lg p-3 border border-green-100">
                     <p className="text-xs text-gray-600">Part 3 (Tự luận)</p>
                     <p className="text-lg font-semibold text-gray-900">
-                      {result.statistics.part3_count}
+                      {(result.statistics as any)?.part3_count ?? (result.statistics as any)?.part_3_questions ?? 0}
                     </p>
                   </div>
                 </div>

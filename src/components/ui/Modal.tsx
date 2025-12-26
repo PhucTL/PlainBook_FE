@@ -5,7 +5,7 @@ import { ReactNode, useEffect } from 'react';
 
 interface ModalProps {
   isOpen: boolean;
-  onClose: () => void;
+  onClose?: () => void;
   title: string;
   children: ReactNode;
   size?: 'sm' | 'md' | 'lg' | 'xl';
@@ -34,7 +34,7 @@ export default function Modal({ isOpen, onClose, title, children, size = 'md' }:
 
   const handleBackdropClick = (e: React.MouseEvent<HTMLDivElement>) => {
     if (e.target === e.currentTarget) {
-      onClose();
+      onClose?.();
     }
   };
 
@@ -54,7 +54,7 @@ export default function Modal({ isOpen, onClose, title, children, size = 'md' }:
         <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200">
           <h2 className="text-2xl font-semibold text-gray-900">{title}</h2>
           <button
-            onClick={onClose}
+            onClick={() => onClose?.()}
             className="p-2 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors"
           >
             <X className="w-5 h-5" />

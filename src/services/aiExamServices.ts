@@ -5,6 +5,7 @@ import type {
   SmartExamRequest,
   ExamGenerationResponse,
   ExamTaskStatusResponse,
+  ExamStatistics,
 } from "@/types";
 
 /**

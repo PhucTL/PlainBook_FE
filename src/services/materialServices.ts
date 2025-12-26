@@ -7,7 +7,7 @@ import {
   createDynamicQueryHook,
   deleteMutationHook,
 } from "@/hooks/react-query";
-import { useInfiniteQuery, useMutation } from "@tanstack/react-query";
+import { useInfiniteQuery } from "@tanstack/react-query";
 import api from "@/config/axios";
 import { API_ENDPOINTS } from "@/constants/apiEndpoints";
 import { supabase } from "@/config/supabaseClient";
@@ -123,7 +123,7 @@ export const uploadFileToSupabase = async (
       .substring(7)}.${fileExtension}`;
 
     // Upload file to Supabase Storage
-    const { data, error } = await supabase.storage
+    const { error } = await supabase.storage
       .from(bucketName)
       .upload(fileName, file, {
         cacheControl: "3600",

@@ -258,8 +258,9 @@ export const createLessonPlanWithAI = async (
       type: "SECTION", // ✅ Backend chỉ chấp nhận 4 types: SECTION, SUBSECTION, PARAGRAPH, LIST_ITEM
       status: "ACTIVE", // ✅ BẮT BUỘC theo FastAPI schema
       children: createdNodes.map((node, index): LessonPlanNode => {
-        const springbootNodeId = node.id || node.data?.id;
-        
+        const n: any = node;
+        const springbootNodeId = n.id || n.data?.id;
+
         if (!springbootNodeId) {
           console.warn(`⚠️ Node ${index} không có ID từ SpringBoot`);
         }

@@ -4,7 +4,7 @@ import {
   createQueryWithPathParamHook,
   updateMutationHook,
 } from "@/hooks/react-query";
-import { useQuery, UseQueryResult } from "@tanstack/react-query";
+import { useQuery, UseQueryResult, UseQueryOptions } from "@tanstack/react-query";
 import { AxiosError } from "axios";
 import api from "@/config/axios";
 import { API_ENDPOINTS } from "@/constants/apiEndpoints";
@@ -30,8 +30,8 @@ export const useUpdateBookService = updateMutationHook("books", API_ENDPOINTS.MA
 export const useBookActiveBySubjectService = (
   subjectId?: string,
   status?: "ACTIVE" | "INACTIVE",
-  options?: any
-): UseQueryResult<any, AxiosError<{ message: string }>> => {
+  options?: UseQueryOptions<unknown, AxiosError<{ message: string }>>
+): UseQueryResult<unknown, AxiosError<{ message: string }>> => {
   // Tạo queryKey bao gồm cả subjectId và status để tự động refetch khi thay đổi
   const queryKey = ["bookActiveBySubject", subjectId, status];
 

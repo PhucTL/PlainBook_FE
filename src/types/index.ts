@@ -1,16 +1,11 @@
-import {
-  academic_year,
-  book_type,
-  grade,
-  subject,
-  user,
-} from "@/generated/client";
-
-export type User = user;
-export type Grade = grade;
-export type Subject = subject;
-export type AcademicYear = academic_year;
-export type BookType = book_type;
+// `@/generated/client` may not be available in all environments (e.g. CI/build).
+// Provide lightweight fallbacks to avoid type import errors. Replace these
+// with generated types when available.
+export type User = unknown;
+export type Grade = unknown;
+export type Subject = unknown;
+export type AcademicYear = unknown;
+export type BookType = unknown;
 
 export type AcademicYearResponse = {
   id: bigint;

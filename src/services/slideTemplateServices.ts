@@ -86,7 +86,7 @@ export const useUpdateSlideTemplateTextBlocksService = () => {
       textBlocks,
     }: {
       id: string;
-      textBlocks: Record<string, any>;
+      textBlocks: Record<string, unknown>;
     }) => {
       const response = await api.put(`${API_ENDPOINTS.SLIDE_TEMPLATES}/${id}`, {
         textBlocks,

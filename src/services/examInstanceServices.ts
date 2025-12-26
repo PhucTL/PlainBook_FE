@@ -93,7 +93,7 @@ export interface SubmissionData {
   maxScore: number;
   submittedAt: string;
   answersJson?: {
-    answers: any[];
+    answers: unknown[];
   };
   resultDetails?: ResultDetail[];
 }
