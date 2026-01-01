@@ -125,8 +125,8 @@ export default function Sidebar() {
       {/* Logo Section */}
       <div className="p-6 border-b border-gray-200">
         <Link href="/" className="flex items-center gap-2">
-          <div className="w-8 h-8 bg-blue-600 rounded-md flex items-center justify-center">
-            <Grid3x3 className="w-5 h-5 text-white" />
+          <div className="w-8 h-8  rounded-md flex items-center justify-center">
+            <img src="/logohighschool.png" alt="Plainbook Logo" className="w-6 h-6" />
           </div>
           <span className="text-lg font-bold text-gray-900">PlainBook</span>
         </Link>

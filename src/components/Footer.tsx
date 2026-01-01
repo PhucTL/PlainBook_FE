@@ -9,8 +9,8 @@ export default function Footer() {
           {/* Logo & Description */}
           <div className="col-span-1">
             <div className="flex items-center space-x-2 mb-4">
-              <div className="w-8 h-8 bg-blue-600 rounded-md flex items-center justify-center">
-                <GraduationCap className="w-5 h-5 text-white" />
+              <div className="w-8 h-8 rounded-md flex items-center justify-center">
+                <img src="/logohighschool.png" alt="Plainbook Logo" className="w-6 h-6" />
               </div>
               <span className="text-xl font-bold text-gray-900">Plainbook</span>
             </div>

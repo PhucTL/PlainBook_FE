@@ -7,6 +7,7 @@ import LayoutProvider from "@/components/providers/LayoutProvider";
 import { ToastContainer } from 'react-toastify';
 import { GoogleOAuthProvider } from "@react-oauth/google";
 import { Toaster } from 'react-hot-toast';
+import IntroWrapper from "@/components/IntroWrapper";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -19,6 +20,11 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
+  icons: {
+    icon: "/logohighschool.png",
+    shortcut: "/logohighschool.png",
+    apple: "/logohighschool.png",
+  },
   title: "Plainbook - Nền tảng quản lý giảng dạy",
   description: "Nâng tầm giảng dạy với Kế hoạch Bài học chuyên nghiệp",
 };
@@ -36,7 +42,9 @@ export default function RootLayout({
         <GoogleOAuthProvider clientId={process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || ""}>
         <QueryProvider>
           <LayoutProvider>
-            {children}
+            <IntroWrapper>
+              {children}
+            </IntroWrapper>
           </LayoutProvider>
           <ToastContainer />
           <Toaster
