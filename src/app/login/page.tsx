@@ -26,7 +26,7 @@ export default function LoginPage() {
           {/* Icon */}
           <AnimatedSection animation="scale" duration={1000} delay={100}>
             <div className="flex justify-center">
-              <img src="/logoHighSchool.png" alt="" className='w-15' />
+              <img src="/logoDark.svg" alt="" className='w-15' />
             </div>
           </AnimatedSection>
 

@@ -21,9 +21,9 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   icons: {
-    icon: "/logohighschool.png",
-    shortcut: "/logohighschool.png",
-    apple: "/logohighschool.png",
+    icon: "/logoDark.svg",
+    shortcut: "/logoDark.svg",
+    apple: "/logoDark.svg",
   },
   title: "Plainbook - Nền tảng quản lý giảng dạy",
   description: "Nâng tầm giảng dạy với Kế hoạch Bài học chuyên nghiệp",

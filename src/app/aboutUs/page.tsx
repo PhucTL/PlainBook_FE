@@ -13,6 +13,7 @@ export default function AboutUsPage() {
         description={aboutConfig.hero.description}
         primaryButtonText={aboutConfig.hero.primaryButtonText}
         secondaryButtonText={aboutConfig.hero.secondaryButtonText}
+        buttonLink={aboutConfig.hero.buttonLink}
         imagePath={aboutConfig.hero.imagePath}
         bgColor="bg-gray-100"
       />
@@ -57,9 +58,6 @@ function ServicesSection() {
                   <p className="text-gray-600 text-sm mb-6 leading-relaxed">
                     {service.description}
                   </p>
-                  <button className={`w-full px-4 py-2 ${service.buttonColor} text-white rounded-md transition-colors font-medium`}>
-                    {service.buttonText}
-                  </button>
                 </div>
               </AnimatedSection>
             );

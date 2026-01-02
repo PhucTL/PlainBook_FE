@@ -10,7 +10,7 @@ export default function Header() {
           <Link href="/" className="flex items-center">
             <div className="flex items-center space-x-2">
               <div className="w-8 h-8  rounded-md flex items-center justify-center">
-                <img src="/logohighschool.png" alt="Plainbook Logo" className="w-6 h-6" />
+                <img src="/logoDark.svg" alt="Plainbook Logo" className="w-6 h-6" />
               </div>
               <span className="text-xl font-bold text-gray-900">Plainbook</span>
             </div>

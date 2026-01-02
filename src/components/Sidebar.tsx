@@ -120,13 +120,17 @@ export default function Sidebar() {
     }
   }
 
+  const logoHref = normalizedRole && (normalizedRole.includes('ADMIN') || normalizedRole.includes('STAFF'))
+    ? '/admin/workspace'
+    : '/workspace';
+
   return (
     <aside className="w-64 bg-white border-r border-gray-200 h-screen flex flex-col fixed left-0 top-0">
       {/* Logo Section */}
       <div className="p-6 border-b border-gray-200">
-        <Link href="/" className="flex items-center gap-2">
+        <Link href={logoHref} className="flex items-center gap-2">
           <div className="w-8 h-8  rounded-md flex items-center justify-center">
-            <img src="/logohighschool.png" alt="Plainbook Logo" className="w-6 h-6" />
+            <img src="/logoDark.svg" alt="Plainbook Logo" className="w-6 h-6" />
           </div>
           <span className="text-lg font-bold text-gray-900">PlainBook</span>
         </Link>

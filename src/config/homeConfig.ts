@@ -5,6 +5,7 @@ export const homeConfig = {
     title: 'Nâng tầm giảng dạy với Kế hoạch Bài học chuyên nghiệp',
     description: 'Tạo, tổ chức và quản lý kế hoạch bài học một cách khoa học, giúp bạn tập trung vào việc truyền đạt kiến thức và nâng cao hiệu quả giảng dạy.',
     buttonText: 'Bắt đầu ngay',
+    buttonLink: '/login',
     imagePath: '/home.png',
   },
   features: {
@@ -98,6 +99,7 @@ export const homeConfig = {
   cta: {
     title: 'Sẵn sàng đổi mới phương pháp giảng dạy của bạn?',
     description: 'Tham gia cùng hàng ngàn nhà giáo dục đang sử dụng mô hình của chúng tôi để nâng cao hiệu quả giảng dạy.',
+    buttonLink: '/login',
     buttonText: 'Bắt đầu ngay',
   },
 };
